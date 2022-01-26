@@ -4,7 +4,10 @@ import (
 	"context"
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
+	grpc2 "github.com/NpoolPlatform/login-gateway/pkg/grpc"
 	npool "github.com/NpoolPlatform/message/npool/logingateway"
+
+	appusermgrpb "github.com/NpoolPlatform/message/npool/appusermgr"
 
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/peer"
@@ -28,5 +31,16 @@ func Login(ctx context.Context, in *npool.LoginRequest) (*npool.LoginResponse, e
 		logger.Sugar().Infof("key: %v value: %v", k, v)
 	}
 
-	return &npool.LoginResponse{}, nil
+	resp, err := grpc2.VerifyAppUserByAppAccountPassword(ctx, &appusermgrpb.VerifyAppUserByAppAccountPasswordRequest{
+		AppID:        in.GetAppID(),
+		Account:      in.GetAccount(),
+		PasswordHash: in.GetPasswordHash(),
+	})
+	if err != nil {
+		return nil, xerrors.Errorf("fail verify username or password: %v", err)
+	}
+
+	return &npool.LoginResponse{
+		Info: resp.Info,
+	}, nil
 }
