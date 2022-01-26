@@ -1,24 +1,24 @@
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
-  name: service-sample-traefik-ingress
+  name: login-gateway-traefik-ingress
   namespace: kube-system
   annotations:
-    k8s.kuboard.cn/displayName: service-sample-traefik
-    k8s.kuboard.cn/workload: service-sample-traefik
+    k8s.kuboard.cn/displayName: login-gateway-traefik
+    k8s.kuboard.cn/workload: login-gateway-traefik
     kubernetes.io/ingress.class: "traefik-internet"
     traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
-    traefik.ingress.kubernetes.io/router.middlewares: kube-system-strip-service-sample-prefix@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-strip-login-gateway-prefix@kubernetescrd
 
 spec:
   rules:
     - host: api.npool.top
       http: &http_rules
         paths:
-          - path: /api/service-sample
+          - path: /api/login-gateway
             backend:
-              serviceName: service-sample
-              servicePort: 32759
+              serviceName: login-gateway
+              servicePort: 50240
     - host: api.xpool.top
       http: *http_rules
     - host: www.npool.top
@@ -33,9 +33,9 @@ spec:
 apiVersion: traefik.containo.us/v1alpha1
 kind: Middleware
 metadata:
-  name: strip-service-sample-prefix
+  name: strip-login-gateway-prefix
   namespace: kube-system
 spec:
   stripPrefix:
     prefixes:
-      - /api/service-sample
+      - /api/login-gateway

@@ -1,0 +1,6 @@
+commonLabels:
+  # app: login-gateway
+
+resources:
+- 01-login-gateway.yaml
+- 02-ingress.yaml

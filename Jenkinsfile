@@ -71,7 +71,7 @@ pipeline {
         sh 'git clone https://github.com/NpoolPlatform/apollo-base-config.git .apollo-base-config'
         sh (returnStdout: false, script: '''
           PASSWORD=`kubectl get secret --namespace "kube-system" mysql-password-secret -o jsonpath="{.data.rootpassword}" | base64 --decode`
-          kubectl exec --namespace kube-system mysql-0 -- mysql -h 127.0.0.1 -uroot -p$PASSWORD -P3306 -e "create database if not exists service_sample;"
+          kubectl exec --namespace kube-system mysql-0 -- mysql -h 127.0.0.1 -uroot -p$PASSWORD -P3306 -e "create database if not exists login_gateway;"
 
           username=`helm status rabbitmq --namespace kube-system | grep Username | awk -F ' : ' '{print $2}' | sed 's/"//g'`
           for vhost in `cat cmd/*/*.viper.yaml | grep hostname | awk '{print $2}' | sed 's/"//g' | sed 's/\\./-/g'`; do
@@ -80,7 +80,7 @@ pipeline {
 
             cd .apollo-base-config
             ./apollo-base-config.sh $APP_ID $TARGET_ENV $vhost
-            ./apollo-item-config.sh $APP_ID $TARGET_ENV $vhost database_name service_sample
+            ./apollo-item-config.sh $APP_ID $TARGET_ENV $vhost database_name login_gateway
             cd -
           done
         '''.stripIndent())
@@ -94,7 +94,7 @@ pipeline {
       steps {
         sh (returnStdout: false, script: '''
           devboxpod=`kubectl get pods -A | grep development-box | awk '{print $2}'`
-          servicename="service-sample"
+          servicename="login-gateway"
 
           kubectl exec --namespace kube-system $devboxpod -- make -C /tmp/$servicename after-test || true
           kubectl exec --namespace kube-system $devboxpod -- rm -rf /tmp/$servicename || true
@@ -250,7 +250,7 @@ pipeline {
       steps {
         sh 'TAG=latest DOCKER_REGISTRY=$DOCKER_REGISTRY make release-docker-images'
         sh(returnStdout: false, script: '''
-          images=`docker images | grep entropypool | grep service-sample | grep none | awk '{ print $3 }'`
+          images=`docker images | grep entropypool | grep login-gateway | grep none | awk '{ print $3 }'`
           for image in $images; do
             docker rmi $image -f
           done
@@ -268,7 +268,7 @@ pipeline {
           tag=`git describe --tags $revlist`
 
           set +e
-          docker images | grep service-sample | grep $tag
+          docker images | grep login-gateway | grep $tag
           rc=$?
           set -e
           if [ 0 -eq $rc ]; then
@@ -295,7 +295,7 @@ pipeline {
           tag=$major.$minor.$patch
 
           set +e
-          docker images | grep service-sample | grep $tag
+          docker images | grep login-gateway | grep $tag
           rc=$?
           set -e
           if [ 0 -eq $rc ]; then
@@ -311,7 +311,7 @@ pipeline {
         expression { TARGET_ENV == 'development' }
       }
       steps {
-        sh 'sed -i "s/uhub.service.ucloud.cn/$DOCKER_REGISTRY/g" cmd/service-sample/k8s/01-service-sample.yaml'
+        sh 'sed -i "s/uhub.service.ucloud.cn/$DOCKER_REGISTRY/g" cmd/login-gateway/k8s/01-login-gateway.yaml'
         sh 'TAG=latest make deploy-to-k8s-cluster'
       }
     }
@@ -328,8 +328,8 @@ pipeline {
 
           git reset --hard
           git checkout $tag
-          sed -i "s/service-sample:latest/service-sample:$tag/g" cmd/service-sample/k8s/01-service-sample.yaml
-          sed -i "s/uhub.service.ucloud.cn/$DOCKER_REGISTRY/g" cmd/service-sample/k8s/01-service-sample.yaml
+          sed -i "s/login-gateway:latest/login-gateway:$tag/g" cmd/login-gateway/k8s/01-login-gateway.yaml
+          sed -i "s/uhub.service.ucloud.cn/$DOCKER_REGISTRY/g" cmd/login-gateway/k8s/01-login-gateway.yaml
           TAG=$tag make deploy-to-k8s-cluster
         '''.stripIndent())
       }
@@ -353,8 +353,8 @@ pipeline {
 
           git reset --hard
           git checkout $tag
-          sed -i "s/service-sample:latest/service-sample:$tag/g" cmd/service-sample/k8s/01-service-sample.yaml
-          sed -i "s/uhub.service.ucloud.cn/$DOCKER_REGISTRY/g" cmd/service-sample/k8s/01-service-sample.yaml
+          sed -i "s/login-gateway:latest/login-gateway:$tag/g" cmd/login-gateway/k8s/01-login-gateway.yaml
+          sed -i "s/uhub.service.ucloud.cn/$DOCKER_REGISTRY/g" cmd/login-gateway/k8s/01-login-gateway.yaml
           TAG=$tag make deploy-to-k8s-cluster
         '''.stripIndent())
       }
