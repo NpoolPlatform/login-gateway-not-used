@@ -53,23 +53,23 @@ func (lhu *LoginHistoryUpdate) SetUserAgent(s string) *LoginHistoryUpdate {
 }
 
 // SetCreateAt sets the "create_at" field.
-func (lhu *LoginHistoryUpdate) SetCreateAt(i int64) *LoginHistoryUpdate {
+func (lhu *LoginHistoryUpdate) SetCreateAt(u uint32) *LoginHistoryUpdate {
 	lhu.mutation.ResetCreateAt()
-	lhu.mutation.SetCreateAt(i)
+	lhu.mutation.SetCreateAt(u)
 	return lhu
 }
 
 // SetNillableCreateAt sets the "create_at" field if the given value is not nil.
-func (lhu *LoginHistoryUpdate) SetNillableCreateAt(i *int64) *LoginHistoryUpdate {
-	if i != nil {
-		lhu.SetCreateAt(*i)
+func (lhu *LoginHistoryUpdate) SetNillableCreateAt(u *uint32) *LoginHistoryUpdate {
+	if u != nil {
+		lhu.SetCreateAt(*u)
 	}
 	return lhu
 }
 
-// AddCreateAt adds i to the "create_at" field.
-func (lhu *LoginHistoryUpdate) AddCreateAt(i int64) *LoginHistoryUpdate {
-	lhu.mutation.AddCreateAt(i)
+// AddCreateAt adds u to the "create_at" field.
+func (lhu *LoginHistoryUpdate) AddCreateAt(u int32) *LoginHistoryUpdate {
+	lhu.mutation.AddCreateAt(u)
 	return lhu
 }
 
@@ -180,14 +180,14 @@ func (lhu *LoginHistoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := lhu.mutation.CreateAt(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt64,
+			Type:   field.TypeUint32,
 			Value:  value,
 			Column: loginhistory.FieldCreateAt,
 		})
 	}
 	if value, ok := lhu.mutation.AddedCreateAt(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt64,
+			Type:   field.TypeUint32,
 			Value:  value,
 			Column: loginhistory.FieldCreateAt,
 		})
@@ -236,23 +236,23 @@ func (lhuo *LoginHistoryUpdateOne) SetUserAgent(s string) *LoginHistoryUpdateOne
 }
 
 // SetCreateAt sets the "create_at" field.
-func (lhuo *LoginHistoryUpdateOne) SetCreateAt(i int64) *LoginHistoryUpdateOne {
+func (lhuo *LoginHistoryUpdateOne) SetCreateAt(u uint32) *LoginHistoryUpdateOne {
 	lhuo.mutation.ResetCreateAt()
-	lhuo.mutation.SetCreateAt(i)
+	lhuo.mutation.SetCreateAt(u)
 	return lhuo
 }
 
 // SetNillableCreateAt sets the "create_at" field if the given value is not nil.
-func (lhuo *LoginHistoryUpdateOne) SetNillableCreateAt(i *int64) *LoginHistoryUpdateOne {
-	if i != nil {
-		lhuo.SetCreateAt(*i)
+func (lhuo *LoginHistoryUpdateOne) SetNillableCreateAt(u *uint32) *LoginHistoryUpdateOne {
+	if u != nil {
+		lhuo.SetCreateAt(*u)
 	}
 	return lhuo
 }
 
-// AddCreateAt adds i to the "create_at" field.
-func (lhuo *LoginHistoryUpdateOne) AddCreateAt(i int64) *LoginHistoryUpdateOne {
-	lhuo.mutation.AddCreateAt(i)
+// AddCreateAt adds u to the "create_at" field.
+func (lhuo *LoginHistoryUpdateOne) AddCreateAt(u int32) *LoginHistoryUpdateOne {
+	lhuo.mutation.AddCreateAt(u)
 	return lhuo
 }
 
@@ -387,14 +387,14 @@ func (lhuo *LoginHistoryUpdateOne) sqlSave(ctx context.Context) (_node *LoginHis
 	}
 	if value, ok := lhuo.mutation.CreateAt(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt64,
+			Type:   field.TypeUint32,
 			Value:  value,
 			Column: loginhistory.FieldCreateAt,
 		})
 	}
 	if value, ok := lhuo.mutation.AddedCreateAt(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt64,
+			Type:   field.TypeUint32,
 			Value:  value,
 			Column: loginhistory.FieldCreateAt,
 		})

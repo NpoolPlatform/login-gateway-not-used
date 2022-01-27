@@ -37,8 +37,8 @@ type LoginHistoryMutation struct {
 	user_id       *uuid.UUID
 	client_ip     *string
 	user_agent    *string
-	create_at     *int64
-	addcreate_at  *int64
+	create_at     *uint32
+	addcreate_at  *int32
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*LoginHistory, error)
@@ -294,13 +294,13 @@ func (m *LoginHistoryMutation) ResetUserAgent() {
 }
 
 // SetCreateAt sets the "create_at" field.
-func (m *LoginHistoryMutation) SetCreateAt(i int64) {
-	m.create_at = &i
+func (m *LoginHistoryMutation) SetCreateAt(u uint32) {
+	m.create_at = &u
 	m.addcreate_at = nil
 }
 
 // CreateAt returns the value of the "create_at" field in the mutation.
-func (m *LoginHistoryMutation) CreateAt() (r int64, exists bool) {
+func (m *LoginHistoryMutation) CreateAt() (r uint32, exists bool) {
 	v := m.create_at
 	if v == nil {
 		return
@@ -311,7 +311,7 @@ func (m *LoginHistoryMutation) CreateAt() (r int64, exists bool) {
 // OldCreateAt returns the old "create_at" field's value of the LoginHistory entity.
 // If the LoginHistory object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *LoginHistoryMutation) OldCreateAt(ctx context.Context) (v int64, err error) {
+func (m *LoginHistoryMutation) OldCreateAt(ctx context.Context) (v uint32, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCreateAt is only allowed on UpdateOne operations")
 	}
@@ -325,17 +325,17 @@ func (m *LoginHistoryMutation) OldCreateAt(ctx context.Context) (v int64, err er
 	return oldValue.CreateAt, nil
 }
 
-// AddCreateAt adds i to the "create_at" field.
-func (m *LoginHistoryMutation) AddCreateAt(i int64) {
+// AddCreateAt adds u to the "create_at" field.
+func (m *LoginHistoryMutation) AddCreateAt(u int32) {
 	if m.addcreate_at != nil {
-		*m.addcreate_at += i
+		*m.addcreate_at += u
 	} else {
-		m.addcreate_at = &i
+		m.addcreate_at = &u
 	}
 }
 
 // AddedCreateAt returns the value that was added to the "create_at" field in this mutation.
-func (m *LoginHistoryMutation) AddedCreateAt() (r int64, exists bool) {
+func (m *LoginHistoryMutation) AddedCreateAt() (r int32, exists bool) {
 	v := m.addcreate_at
 	if v == nil {
 		return
@@ -459,7 +459,7 @@ func (m *LoginHistoryMutation) SetField(name string, value ent.Value) error {
 		m.SetUserAgent(v)
 		return nil
 	case loginhistory.FieldCreateAt:
-		v, ok := value.(int64)
+		v, ok := value.(uint32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -496,7 +496,7 @@ func (m *LoginHistoryMutation) AddedField(name string) (ent.Value, bool) {
 func (m *LoginHistoryMutation) AddField(name string, value ent.Value) error {
 	switch name {
 	case loginhistory.FieldCreateAt:
-		v, ok := value.(int64)
+		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}

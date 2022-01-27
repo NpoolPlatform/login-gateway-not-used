@@ -5,6 +5,7 @@ import (
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 
+	loginhistorycrud "github.com/NpoolPlatform/login-gateway/pkg/crud/loginhistory"
 	mw "github.com/NpoolPlatform/login-gateway/pkg/middleware/login"
 	npool "github.com/NpoolPlatform/message/npool/logingateway"
 
@@ -34,5 +35,10 @@ func (s *Server) Refresh(ctx context.Context, in *npool.RefreshRequest) (*npool.
 }
 
 func (s *Server) GetLoginHistories(ctx context.Context, in *npool.GetLoginHistoriesRequest) (*npool.GetLoginHistoriesResponse, error) {
-	return nil, nil
+	resp, err := loginhistorycrud.GetAll(ctx, in)
+	if err != nil {
+		logger.Sugar().Errorw("fail get login history: %v", err)
+		return &npool.GetLoginHistoriesResponse{}, status.Error(codes.Internal, err.Error())
+	}
+	return resp, nil
 }

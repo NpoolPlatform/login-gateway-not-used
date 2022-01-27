@@ -25,7 +25,7 @@ type LoginHistory struct {
 	// UserAgent holds the value of the "user_agent" field.
 	UserAgent string `json:"user_agent,omitempty"`
 	// CreateAt holds the value of the "create_at" field.
-	CreateAt int64 `json:"create_at,omitempty"`
+	CreateAt uint32 `json:"create_at,omitempty"`
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -88,7 +88,7 @@ func (lh *LoginHistory) assignValues(columns []string, values []interface{}) err
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field create_at", values[i])
 			} else if value.Valid {
-				lh.CreateAt = value.Int64
+				lh.CreateAt = uint32(value.Int64)
 			}
 		}
 	}

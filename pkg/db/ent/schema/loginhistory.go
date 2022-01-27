@@ -24,9 +24,9 @@ func (LoginHistory) Fields() []ent.Field {
 		field.UUID("user_id", uuid.UUID{}),
 		field.String("client_ip"),
 		field.String("user_agent"),
-		field.Int64("create_at").
-			DefaultFunc(func() int64 {
-				return time.Now().UnixNano()
+		field.Uint32("create_at").
+			DefaultFunc(func() uint32 {
+				return uint32(time.Now().Unix())
 			}),
 	}
 }

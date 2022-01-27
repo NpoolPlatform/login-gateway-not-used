@@ -48,15 +48,15 @@ func (lhc *LoginHistoryCreate) SetUserAgent(s string) *LoginHistoryCreate {
 }
 
 // SetCreateAt sets the "create_at" field.
-func (lhc *LoginHistoryCreate) SetCreateAt(i int64) *LoginHistoryCreate {
-	lhc.mutation.SetCreateAt(i)
+func (lhc *LoginHistoryCreate) SetCreateAt(u uint32) *LoginHistoryCreate {
+	lhc.mutation.SetCreateAt(u)
 	return lhc
 }
 
 // SetNillableCreateAt sets the "create_at" field if the given value is not nil.
-func (lhc *LoginHistoryCreate) SetNillableCreateAt(i *int64) *LoginHistoryCreate {
-	if i != nil {
-		lhc.SetCreateAt(*i)
+func (lhc *LoginHistoryCreate) SetNillableCreateAt(u *uint32) *LoginHistoryCreate {
+	if u != nil {
+		lhc.SetCreateAt(*u)
 	}
 	return lhc
 }
@@ -244,7 +244,7 @@ func (lhc *LoginHistoryCreate) createSpec() (*LoginHistory, *sqlgraph.CreateSpec
 	}
 	if value, ok := lhc.mutation.CreateAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt64,
+			Type:   field.TypeUint32,
 			Value:  value,
 			Column: loginhistory.FieldCreateAt,
 		})
@@ -353,7 +353,7 @@ func (u *LoginHistoryUpsert) UpdateUserAgent() *LoginHistoryUpsert {
 }
 
 // SetCreateAt sets the "create_at" field.
-func (u *LoginHistoryUpsert) SetCreateAt(v int64) *LoginHistoryUpsert {
+func (u *LoginHistoryUpsert) SetCreateAt(v uint32) *LoginHistoryUpsert {
 	u.Set(loginhistory.FieldCreateAt, v)
 	return u
 }
@@ -365,7 +365,7 @@ func (u *LoginHistoryUpsert) UpdateCreateAt() *LoginHistoryUpsert {
 }
 
 // AddCreateAt adds v to the "create_at" field.
-func (u *LoginHistoryUpsert) AddCreateAt(v int64) *LoginHistoryUpsert {
+func (u *LoginHistoryUpsert) AddCreateAt(v uint32) *LoginHistoryUpsert {
 	u.Add(loginhistory.FieldCreateAt, v)
 	return u
 }
@@ -477,14 +477,14 @@ func (u *LoginHistoryUpsertOne) UpdateUserAgent() *LoginHistoryUpsertOne {
 }
 
 // SetCreateAt sets the "create_at" field.
-func (u *LoginHistoryUpsertOne) SetCreateAt(v int64) *LoginHistoryUpsertOne {
+func (u *LoginHistoryUpsertOne) SetCreateAt(v uint32) *LoginHistoryUpsertOne {
 	return u.Update(func(s *LoginHistoryUpsert) {
 		s.SetCreateAt(v)
 	})
 }
 
 // AddCreateAt adds v to the "create_at" field.
-func (u *LoginHistoryUpsertOne) AddCreateAt(v int64) *LoginHistoryUpsertOne {
+func (u *LoginHistoryUpsertOne) AddCreateAt(v uint32) *LoginHistoryUpsertOne {
 	return u.Update(func(s *LoginHistoryUpsert) {
 		s.AddCreateAt(v)
 	})
@@ -770,14 +770,14 @@ func (u *LoginHistoryUpsertBulk) UpdateUserAgent() *LoginHistoryUpsertBulk {
 }
 
 // SetCreateAt sets the "create_at" field.
-func (u *LoginHistoryUpsertBulk) SetCreateAt(v int64) *LoginHistoryUpsertBulk {
+func (u *LoginHistoryUpsertBulk) SetCreateAt(v uint32) *LoginHistoryUpsertBulk {
 	return u.Update(func(s *LoginHistoryUpsert) {
 		s.SetCreateAt(v)
 	})
 }
 
 // AddCreateAt adds v to the "create_at" field.
-func (u *LoginHistoryUpsertBulk) AddCreateAt(v int64) *LoginHistoryUpsertBulk {
+func (u *LoginHistoryUpsertBulk) AddCreateAt(v uint32) *LoginHistoryUpsertBulk {
 	return u.Update(func(s *LoginHistoryUpsert) {
 		s.AddCreateAt(v)
 	})
