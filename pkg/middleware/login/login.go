@@ -131,3 +131,29 @@ func Logined(ctx context.Context, in *npool.LoginedRequest) (*npool.LoginedRespo
 		Info: meta.UserInfo,
 	}, nil
 }
+
+func Logout(ctx context.Context, in *npool.LogoutRequest) (*npool.LogoutResponse, error) {
+	appID, err := uuid.Parse(in.GetAppID())
+	if err != nil {
+		return nil, xerrors.Errorf("invalid app id: %v", err)
+	}
+
+	userID, err := uuid.Parse(in.GetUserID())
+	if err != nil {
+		return nil, xerrors.Errorf("invalid user id: %v", err)
+	}
+
+	meta, err := queryByAppUser(ctx, appID, userID)
+	if err != nil {
+		return nil, xerrors.Errorf("fail query login cache by app user: %v", err)
+	}
+
+	err = deleteCache(ctx, meta)
+	if err != nil {
+		return nil, xerrors.Errorf("fail delete login cache: %v", err)
+	}
+
+	return &npool.LogoutResponse{
+		Info: meta.UserInfo,
+	}, nil
+}
