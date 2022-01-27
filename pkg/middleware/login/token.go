@@ -56,7 +56,6 @@ func (meta *Metadata) ToJWTClaims() jwt.MapClaims {
 	claims["user_id"] = meta.AppID
 	claims["client_ip"] = meta.ClientIP
 	claims["user_agent"] = meta.UserAgent
-	claims["user_info"] = meta.UserInfo
 
 	return claims
 }
