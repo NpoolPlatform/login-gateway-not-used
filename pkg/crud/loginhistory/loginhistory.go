@@ -26,9 +26,21 @@ func Create(ctx context.Context, in *npool.LoginHistory) error {
 		return xerrors.Errorf("fail get db client: %v", err)
 	}
 
+	appID, err := uuid.Parse(in.GetAppID())
+	if err != nil {
+		return xerrors.Errorf("invalid app id: %v", err)
+	}
+
+	userID, err := uuid.Parse(in.GetUserID())
+	if err != nil {
+		return xerrors.Errorf("invalid user id: %v", err)
+	}
+
 	_, err = cli.
 		LoginHistory.
 		Create().
+		SetAppID(appID).
+		SetUserID(userID).
 		SetClientIP(in.GetClientIP()).
 		SetUserAgent(in.GetUserAgent()).
 		Save(ctx)

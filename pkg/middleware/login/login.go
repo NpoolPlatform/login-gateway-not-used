@@ -7,9 +7,6 @@ import (
 	grpc2 "github.com/NpoolPlatform/login-gateway/pkg/grpc"
 	npool "github.com/NpoolPlatform/message/npool/logingateway"
 
-	grpc "google.golang.org/grpc"
-	"google.golang.org/grpc/metadata"
-
 	appusermgrpb "github.com/NpoolPlatform/message/npool/appusermgr"
 
 	"github.com/google/uuid"
@@ -60,6 +57,8 @@ func Login(ctx context.Context, in *npool.LoginRequest) (*npool.LoginResponse, e
 	// TODO: add to redis
 
 	err = loginhistorycrud.Create(ctx, &npool.LoginHistory{
+		AppID:     in.GetAppID(),
+		UserID:    resp.Info.User.ID,
 		ClientIP:  meta.ClientIP.String(),
 		UserAgent: meta.UserAgent,
 	})
@@ -68,13 +67,8 @@ func Login(ctx context.Context, in *npool.LoginRequest) (*npool.LoginResponse, e
 	}
 	// TODO: check login type of app
 
-	header := metadata.Pairs("X-App-Login-Token", token)
-	err = grpc.SetHeader(ctx, header)
-	if err != nil {
-		return nil, xerrors.Errorf("fail set header: %v", err)
-	}
-
 	return &npool.LoginResponse{
-		Info: resp.Info,
+		Info:  resp.Info,
+		Token: token,
 	}, nil
 }
