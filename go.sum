@@ -61,8 +61,9 @@ github.com/NpoolPlatform/api-manager v0.0.0-20220121051827-18c807c114dc h1:JFUaq
 github.com/NpoolPlatform/api-manager v0.0.0-20220121051827-18c807c114dc/go.mod h1:ubnvHuhc0o6drhdYrT+nM5DXZW/yEesObWky6oRsHoQ=
 github.com/NpoolPlatform/appuser-manager v0.0.0-20220126160509-d91593fa9fa2 h1:Mp063KnSCs2785zXKPx89gDyfwgVTs9mOG9FD84vQnA=
 github.com/NpoolPlatform/appuser-manager v0.0.0-20220126160509-d91593fa9fa2/go.mod h1:nxXkzxeBSfyzJ3GGAT4iLhjFVlsCLDmLx6SaKLa0yy4=
-github.com/NpoolPlatform/go-service-framework v0.0.0-20220120091626-4e8035637592 h1:fsYAxdFmjSWMW+uoSmXC7YcG9QGdqiC/P1cnvCt1XTo=
 github.com/NpoolPlatform/go-service-framework v0.0.0-20220120091626-4e8035637592/go.mod h1:JqrktA7gNQe/Uprnr6DCs5UCFpheCZ30lDd0OkyRtC4=
+github.com/NpoolPlatform/go-service-framework v0.0.0-20220127065610-71daae2055bc h1:C1fU6SLpSXeq2CY1D5YMA9u+f7a5nqvcDwhaaW81JdM=
+github.com/NpoolPlatform/go-service-framework v0.0.0-20220127065610-71daae2055bc/go.mod h1:G5SKpcIWWkyxeNtgI8c0iY8py6DY2xHZFGKPJpTEon0=
 github.com/NpoolPlatform/message v0.0.0-20220120075427-38182760a780/go.mod h1:tnsf7zHQ5Mv2uG0ezOwCfm/bxluiRW10DeuIl4SjG4Y=
 github.com/NpoolPlatform/message v0.0.0-20220121040326-31d316062cdc/go.mod h1:tnsf7zHQ5Mv2uG0ezOwCfm/bxluiRW10DeuIl4SjG4Y=
 github.com/NpoolPlatform/message v0.0.0-20220126154557-410153a86b92/go.mod h1:tnsf7zHQ5Mv2uG0ezOwCfm/bxluiRW10DeuIl4SjG4Y=
