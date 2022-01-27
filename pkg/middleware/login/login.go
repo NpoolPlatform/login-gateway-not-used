@@ -32,35 +32,58 @@ func Login(ctx context.Context, in *npool.LoginRequest) (*npool.LoginResponse, e
 		return nil, xerrors.Errorf("fail create login metadata: %v", err)
 	}
 
-	meta.AppID = appID
-	meta.Account = in.GetAccount()
-	meta.LoginType = in.GetLoginType()
+	var userInfo *appusermgrpb.AppUserInfo
+	cached := false
+	token := ""
 
-	// TODO: check if cached
-	// TODO: if verify is not OK, login again
-
-	resp, err := grpc2.VerifyAppUserByAppAccountPassword(ctx, &appusermgrpb.VerifyAppUserByAppAccountPasswordRequest{
-		AppID:        in.GetAppID(),
-		Account:      in.GetAccount(),
-		PasswordHash: in.GetPasswordHash(),
-	})
+	query, err := queryByAppAccount(ctx, appID, in.GetAccount(), in.GetLoginType())
 	if err != nil {
-		return nil, xerrors.Errorf("fail verify username or password: %v", err)
+		return nil, xerrors.Errorf("fail query login cache by app acount: %v", err)
+	}
+	if query != nil {
+		// TODO: verify login info and token
+		userInfo = query.UserInfo
+		cached = true
 	}
 
-	meta.UserInfo = resp.Info
-	meta.UserID = uuid.MustParse(resp.Info.User.ID)
+	if !cached {
+		meta.AppID = appID
+		meta.Account = in.GetAccount()
+		meta.LoginType = in.GetLoginType()
 
-	token, err := createToken(meta)
-	if err != nil {
-		return nil, xerrors.Errorf("fail create token: %v", err)
+		// TODO: check if cached
+		// TODO: if verify is not OK, login again
+
+		resp, err := grpc2.VerifyAppUserByAppAccountPassword(ctx, &appusermgrpb.VerifyAppUserByAppAccountPasswordRequest{
+			AppID:        in.GetAppID(),
+			Account:      in.GetAccount(),
+			PasswordHash: in.GetPasswordHash(),
+		})
+		if err != nil {
+			return nil, xerrors.Errorf("fail verify username or password: %v", err)
+		}
+
+		userInfo = resp.Info
 	}
 
-	// TODO: add to redis
+	meta.UserInfo = userInfo
+	meta.UserID = uuid.MustParse(userInfo.User.ID)
+
+	if !cached {
+		token, err = createToken(meta)
+		if err != nil {
+			return nil, xerrors.Errorf("fail create token: %v", err)
+		}
+	}
+
+	err = createCache(ctx, meta)
+	if err != nil {
+		return nil, xerrors.Errorf("fail create cache: %v", err)
+	}
 
 	err = loginhistorycrud.Create(ctx, &npool.LoginHistory{
 		AppID:     in.GetAppID(),
-		UserID:    resp.Info.User.ID,
+		UserID:    userInfo.User.ID,
 		ClientIP:  meta.ClientIP.String(),
 		UserAgent: meta.UserAgent,
 	})
@@ -70,7 +93,7 @@ func Login(ctx context.Context, in *npool.LoginRequest) (*npool.LoginResponse, e
 	// TODO: check login type of app
 
 	return &npool.LoginResponse{
-		Info:  resp.Info,
+		Info:  userInfo,
 		Token: token,
 	}, nil
 }

@@ -9,6 +9,7 @@ require (
 	github.com/NpoolPlatform/go-service-framework v0.0.0-20220127065610-71daae2055bc
 	github.com/NpoolPlatform/message v0.0.0-20220127053947-4fea5b56d8ea
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/go-redis/redis/v8 v8.11.4
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/uuid v1.3.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.2
