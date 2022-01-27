@@ -49,6 +49,7 @@ func Login(ctx context.Context, in *npool.LoginRequest) (*npool.LoginResponse, e
 	}
 
 	meta.UserInfo = resp.Info
+	meta.UserID = uuid.MustParse(resp.Info.User.ID)
 
 	token, err := createToken(meta)
 	if err != nil {

@@ -18,6 +18,7 @@ type Metadata struct {
 	AppID     uuid.UUID
 	Account   string
 	LoginType string
+	UserID    uuid.UUID
 	ClientIP  net.IP
 	UserAgent string
 	UserInfo  *appusermgrpb.AppUserInfo
@@ -53,7 +54,9 @@ func (meta *Metadata) ToJWTClaims() jwt.MapClaims {
 	claims := jwt.MapClaims{}
 
 	claims["app_id"] = meta.AppID
-	claims["user_id"] = meta.AppID
+	claims["user_id"] = meta.UserID
+	claims["account"] = meta.Account
+	claims["login_type"] = meta.LoginType
 	claims["client_ip"] = meta.ClientIP
 	claims["user_agent"] = meta.UserAgent
 
