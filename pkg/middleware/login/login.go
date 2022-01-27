@@ -37,6 +37,7 @@ func Login(ctx context.Context, in *npool.LoginRequest) (*npool.LoginResponse, e
 	meta.LoginType = in.GetLoginType()
 
 	// TODO: check if cached
+	// TODO: if verify is not OK, login again
 
 	resp, err := grpc2.VerifyAppUserByAppAccountPassword(ctx, &appusermgrpb.VerifyAppUserByAppAccountPasswordRequest{
 		AppID:        in.GetAppID(),
