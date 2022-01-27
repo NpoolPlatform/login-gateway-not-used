@@ -31,6 +31,9 @@ func Login(ctx context.Context, in *npool.LoginRequest) (*npool.LoginResponse, e
 	if err != nil {
 		return nil, xerrors.Errorf("fail create login metadata: %v", err)
 	}
+	meta.AppID = appID
+	meta.Account = in.GetAccount()
+	meta.LoginType = in.GetLoginType()
 
 	var userInfo *appusermgrpb.AppUserInfo
 	cached := false
@@ -41,19 +44,21 @@ func Login(ctx context.Context, in *npool.LoginRequest) (*npool.LoginResponse, e
 		return nil, xerrors.Errorf("fail query login cache by app acount: %v", err)
 	}
 	if query != nil {
-		// TODO: verify login info and token
-		userInfo = query.UserInfo
-		cached = true
+		if in.GetToken() != "" {
+			userInfo = query.UserInfo
+
+			meta.UserInfo = userInfo
+			meta.UserID = uuid.MustParse(userInfo.User.ID)
+			token = in.GetToken()
+
+			err := verifyToken(meta, in.GetToken())
+			if err == nil {
+				cached = true
+			}
+		}
 	}
 
 	if !cached {
-		meta.AppID = appID
-		meta.Account = in.GetAccount()
-		meta.LoginType = in.GetLoginType()
-
-		// TODO: check if cached
-		// TODO: if verify is not OK, login again
-
 		resp, err := grpc2.VerifyAppUserByAppAccountPassword(ctx, &appusermgrpb.VerifyAppUserByAppAccountPasswordRequest{
 			AppID:        in.GetAppID(),
 			Account:      in.GetAccount(),
@@ -64,12 +69,10 @@ func Login(ctx context.Context, in *npool.LoginRequest) (*npool.LoginResponse, e
 		}
 
 		userInfo = resp.Info
-	}
 
-	meta.UserInfo = userInfo
-	meta.UserID = uuid.MustParse(userInfo.User.ID)
+		meta.UserInfo = userInfo
+		meta.UserID = uuid.MustParse(userInfo.User.ID)
 
-	if !cached {
 		token, err = createToken(meta)
 		if err != nil {
 			return nil, xerrors.Errorf("fail create token: %v", err)

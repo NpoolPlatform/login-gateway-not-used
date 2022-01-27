@@ -63,6 +63,34 @@ func (meta *Metadata) ToJWTClaims() jwt.MapClaims {
 	return claims
 }
 
+func (meta *Metadata) ValidateJWTClaims(claims jwt.MapClaims) error {
+	appID, ok := claims["app_id"]
+	if !ok || appID != meta.AppID {
+		return xerrors.Errorf("invalid app id")
+	}
+	userID, ok := claims["user_id"]
+	if !ok || userID != meta.UserID {
+		return xerrors.Errorf("invalid user id")
+	}
+	account, ok := claims["account"]
+	if !ok || account != meta.Account {
+		return xerrors.Errorf("invalid account")
+	}
+	loginType, ok := claims["login_type"]
+	if !ok || loginType != meta.LoginType {
+		return xerrors.Errorf("invalid login type")
+	}
+	clientIP, ok := claims["client_ip"]
+	if !ok || clientIP != meta.ClientIP.String() {
+		return xerrors.Errorf("invalid client ip")
+	}
+	userAgent, ok := claims["user_agent"]
+	if !ok || userAgent != meta.UserAgent {
+		return xerrors.Errorf("invalid user agent")
+	}
+	return nil
+}
+
 func createToken(meta *Metadata) (string, error) {
 	tokenAccessSecret := os.Getenv("LOGIN_TOKEN_ACCESS_SECRET")
 	if tokenAccessSecret == "" {
@@ -77,4 +105,36 @@ func createToken(meta *Metadata) (string, error) {
 	}
 
 	return token, nil
+}
+
+func verifyToken(meta *Metadata, token string) error {
+	jwtToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, xerrors.Errorf("unexpected signing method")
+		}
+		tokenAccessSecret := os.Getenv("LOGIN_TOKEN_ACCESS_SECRET")
+		if tokenAccessSecret == "" {
+			return "", xerrors.Errorf("invalid login token access secret")
+		}
+		return []byte(tokenAccessSecret), nil
+	})
+	if err != nil {
+		return xerrors.Errorf("fail parse jwt token: %v", err)
+	}
+
+	if !jwtToken.Valid {
+		return xerrors.Errorf("invalid token")
+	}
+
+	claims, ok := jwtToken.Claims.(jwt.MapClaims)
+	if !ok {
+		return xerrors.Errorf("type seertion fail of jwt token")
+	}
+
+	err = meta.ValidateJWTClaims(claims)
+	if err != nil {
+		return xerrors.Errorf("invalid token")
+	}
+
+	return nil
 }
