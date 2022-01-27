@@ -8,19 +8,24 @@ import (
 )
 
 var (
-	// EmptiesColumns holds the columns for the "empties" table.
-	EmptiesColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
+	// LoginHistoriesColumns holds the columns for the "login_histories" table.
+	LoginHistoriesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "app_id", Type: field.TypeUUID},
+		{Name: "user_id", Type: field.TypeUUID},
+		{Name: "client_ip", Type: field.TypeString},
+		{Name: "user_agent", Type: field.TypeString},
+		{Name: "create_at", Type: field.TypeInt64},
 	}
-	// EmptiesTable holds the schema information for the "empties" table.
-	EmptiesTable = &schema.Table{
-		Name:       "empties",
-		Columns:    EmptiesColumns,
-		PrimaryKey: []*schema.Column{EmptiesColumns[0]},
+	// LoginHistoriesTable holds the schema information for the "login_histories" table.
+	LoginHistoriesTable = &schema.Table{
+		Name:       "login_histories",
+		Columns:    LoginHistoriesColumns,
+		PrimaryKey: []*schema.Column{LoginHistoriesColumns[0]},
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
-		EmptiesTable,
+		LoginHistoriesTable,
 	}
 )
 

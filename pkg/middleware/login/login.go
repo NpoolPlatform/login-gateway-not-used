@@ -3,33 +3,43 @@ package login
 import (
 	"context"
 
-	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
+	loginhistorycrud "github.com/NpoolPlatform/login-gateway/pkg/crud/loginhistory"
 	grpc2 "github.com/NpoolPlatform/login-gateway/pkg/grpc"
 	npool "github.com/NpoolPlatform/message/npool/logingateway"
 
+	grpc "google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
+
 	appusermgrpb "github.com/NpoolPlatform/message/npool/appusermgr"
 
-	"google.golang.org/grpc/metadata"
-	"google.golang.org/grpc/peer"
+	"github.com/google/uuid"
 
 	"golang.org/x/xerrors"
 )
 
 func Login(ctx context.Context, in *npool.LoginRequest) (*npool.LoginResponse, error) {
-	myPeer, ok := peer.FromContext(ctx)
-	if !ok {
-		return nil, xerrors.Errorf("fail get peer")
+	// TODO: check man machine spec
+	// TODO: check environment, if safe, just login
+
+	appID, err := uuid.Parse(in.GetAppID())
+	if err != nil {
+		return nil, xerrors.Errorf("invalid app id: %v", err)
 	}
 
-	meta, ok := metadata.FromIncomingContext(ctx)
-	if !ok {
-		return nil, xerrors.Errorf("fail get metadata")
+	if in.GetAccount() == "" {
+		return nil, xerrors.Errorf("invalid account: %v", err)
 	}
 
-	logger.Sugar().Infof("addr: %v auth: %v", myPeer.Addr, myPeer.AuthInfo)
-	for k, v := range meta {
-		logger.Sugar().Infof("key: %v value: %v", k, v)
+	meta, err := MetadataFromContext(ctx)
+	if err != nil {
+		return nil, xerrors.Errorf("fail create login metadata: %v", err)
 	}
+
+	meta.AppID = appID
+	meta.Account = in.GetAccount()
+	meta.LoginType = in.GetLoginType()
+
+	// TODO: check if cached
 
 	resp, err := grpc2.VerifyAppUserByAppAccountPassword(ctx, &appusermgrpb.VerifyAppUserByAppAccountPasswordRequest{
 		AppID:        in.GetAppID(),
@@ -38,6 +48,30 @@ func Login(ctx context.Context, in *npool.LoginRequest) (*npool.LoginResponse, e
 	})
 	if err != nil {
 		return nil, xerrors.Errorf("fail verify username or password: %v", err)
+	}
+
+	meta.UserInfo = resp.Info
+
+	token, err := createToken(meta)
+	if err != nil {
+		return nil, xerrors.Errorf("fail create token: %v", err)
+	}
+
+	// TODO: add to redis
+
+	err = loginhistorycrud.Create(ctx, &npool.LoginHistory{
+		ClientIP:  meta.ClientIP.String(),
+		UserAgent: meta.UserAgent,
+	})
+	if err != nil {
+		return nil, xerrors.Errorf("fail create login history: %v", err)
+	}
+	// TODO: check login type of app
+
+	header := metadata.Pairs("X-App-Login-Token", token)
+	err = grpc.SetHeader(ctx, header)
+	if err != nil {
+		return nil, xerrors.Errorf("fail set header: %v", err)
 	}
 
 	return &npool.LoginResponse{

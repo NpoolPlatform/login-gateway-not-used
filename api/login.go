@@ -32,3 +32,7 @@ func (s *Server) Logout(ctx context.Context, in *npool.LogoutRequest) (*npool.Lo
 func (s *Server) Refresh(ctx context.Context, in *npool.RefreshRequest) (*npool.RefreshResponse, error) {
 	return nil, nil
 }
+
+func (s *Server) GetLoginHistories(ctx context.Context, in *npool.GetLoginHistoriesRequest) (*npool.GetLoginHistoriesResponse, error) {
+	return nil, nil
+}
