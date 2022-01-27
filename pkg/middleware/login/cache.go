@@ -49,15 +49,25 @@ func createCache(ctx context.Context, meta *Metadata) error {
 	ctx, cancel := context.WithTimeout(ctx, redisTimeout)
 	defer cancel()
 
-	err = cli.Set(ctx, metaToAccountKey(meta), meta, loginExpiration).Err()
+	body, err := json.Marshal(meta)
+	if err != nil {
+		return xerrors.Errorf("fail marshal login account meta: %v", err)
+	}
+
+	err = cli.Set(ctx, metaToAccountKey(meta), body, loginExpiration).Err()
 	if err != nil {
 		return xerrors.Errorf("fail create login account cache: %v", err)
 	}
 
-	err = cli.Set(ctx, metaToUserKey(meta), &valAppUser{
+	body, err = json.Marshal(&valAppUser{
 		Account:   meta.Account,
 		LoginType: meta.LoginType,
-	}, loginExpiration).Err()
+	})
+	if err != nil {
+		return xerrors.Errorf("fail marshal login user meta: %v", err)
+	}
+
+	err = cli.Set(ctx, metaToUserKey(meta), body, loginExpiration).Err()
 	if err != nil {
 		return xerrors.Errorf("fail create login user cache: %v", err)
 	}
