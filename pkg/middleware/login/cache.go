@@ -100,7 +100,6 @@ func queryByAppAccount(ctx context.Context, appID uuid.UUID, account, loginType 
 	return &meta, nil
 }
 
-/*
 func queryByAppUser(ctx context.Context, appID, userID uuid.UUID) (*Metadata, error) {
 	cli, err := redis2.GetClient()
 	if err != nil {
@@ -125,4 +124,3 @@ func queryByAppUser(ctx context.Context, appID, userID uuid.UUID) (*Metadata, er
 
 	return &meta, nil
 }
-*/

@@ -23,14 +23,15 @@ func (s *Server) Login(ctx context.Context, in *npool.LoginRequest) (*npool.Logi
 }
 
 func (s *Server) Logined(ctx context.Context, in *npool.LoginedRequest) (*npool.LoginedResponse, error) {
-	return nil, nil
+	resp, err := mw.Logined(ctx, in)
+	if err != nil {
+		logger.Sugar().Errorf("fail logined: %v", err)
+		return &npool.LoginedResponse{}, status.Error(codes.Internal, err.Error())
+	}
+	return resp, nil
 }
 
 func (s *Server) Logout(ctx context.Context, in *npool.LogoutRequest) (*npool.LogoutResponse, error) {
-	return nil, nil
-}
-
-func (s *Server) Refresh(ctx context.Context, in *npool.RefreshRequest) (*npool.RefreshResponse, error) {
 	return nil, nil
 }
 

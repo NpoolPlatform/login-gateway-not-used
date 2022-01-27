@@ -7,7 +7,7 @@ require (
 	github.com/NpoolPlatform/api-manager v0.0.0-20220121051827-18c807c114dc
 	github.com/NpoolPlatform/appuser-manager v0.0.0-20220126160509-d91593fa9fa2
 	github.com/NpoolPlatform/go-service-framework v0.0.0-20220127085959-4940540d8042
-	github.com/NpoolPlatform/message v0.0.0-20220127083115-c509be6ef0b0
+	github.com/NpoolPlatform/message v0.0.0-20220127092203-16fa1b6cf547
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-redis/redis/v8 v8.11.4
 	github.com/go-resty/resty/v2 v2.7.0
