@@ -16,7 +16,7 @@ import (
 func (s *Server) Login(ctx context.Context, in *npool.LoginRequest) (*npool.LoginResponse, error) {
 	resp, err := mw.Login(ctx, in)
 	if err != nil {
-		logger.Sugar().Errorw("fail login: %v", err)
+		logger.Sugar().Errorf("fail login: %v", err)
 		return &npool.LoginResponse{}, status.Error(codes.Internal, err.Error())
 	}
 	return resp, nil
@@ -37,7 +37,7 @@ func (s *Server) Refresh(ctx context.Context, in *npool.RefreshRequest) (*npool.
 func (s *Server) GetLoginHistories(ctx context.Context, in *npool.GetLoginHistoriesRequest) (*npool.GetLoginHistoriesResponse, error) {
 	resp, err := loginhistorycrud.GetAll(ctx, in)
 	if err != nil {
-		logger.Sugar().Errorw("fail get login history: %v", err)
+		logger.Sugar().Errorf("fail get login history: %v", err)
 		return &npool.GetLoginHistoriesResponse{}, status.Error(codes.Internal, err.Error())
 	}
 	return resp, nil
