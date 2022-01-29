@@ -27,7 +27,7 @@ spec:
             backend:
               serviceName: login-gateway
               servicePort: 50240
-    - host: api.procyon.top
+    - host: api.procyon.vip
       http: *http_rules
     - host: api.xpool.top
       http: *http_rules
@@ -64,7 +64,7 @@ spec:
             backend:
               serviceName: login-gateway
               servicePort: 50240
-    - host: api.procyon.top
+    - host: api.procyon.vip
       http: *http_rules
     - host: api.xpool.top
       http: *http_rules
