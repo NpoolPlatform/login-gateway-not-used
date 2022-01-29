@@ -7,15 +7,41 @@ import (
 	grpc2 "github.com/NpoolPlatform/login-gateway/pkg/grpc"
 	npool "github.com/NpoolPlatform/message/npool/logingateway"
 
+	appusermgrconst "github.com/NpoolPlatform/appuser-manager/pkg/const"
 	appusermgrpb "github.com/NpoolPlatform/message/npool/appusermgr"
+
+	verificationpb "github.com/NpoolPlatform/message/npool/verification"
 
 	"github.com/google/uuid"
 
 	"golang.org/x/xerrors"
 )
 
-func Login(ctx context.Context, in *npool.LoginRequest) (*npool.LoginResponse, error) {
-	// TODO: check man machine spec (recaptcha)
+func Login(ctx context.Context, in *npool.LoginRequest) (*npool.LoginResponse, error) { //nolint
+	resp, err := grpc2.GetAppInfo(ctx, &appusermgrpb.GetAppInfoRequest{
+		ID: in.GetAppID(),
+	})
+	if err != nil {
+		return nil, xerrors.Errorf("fail get app info: %v", err)
+	}
+
+	if resp.Info.Ctrl != nil && resp.Info.Ctrl.RecaptchaMethod == appusermgrconst.RecaptchaGoogleV3 {
+		if in.GetManMachineSpec() == "" {
+			return nil, xerrors.Errorf("miss recaptcha")
+		}
+
+		resp, err := grpc2.VerifyGoogleRecaptcha(ctx, &verificationpb.VerifyGoogleRecaptchaRequest{
+			Response: in.GetManMachineSpec(),
+		})
+		if err != nil {
+			return nil, xerrors.Errorf("fail verify google recaptcha: %v", err)
+		}
+
+		if !resp.Info {
+			return nil, xerrors.Errorf("invalid google recaptcha verification response")
+		}
+	}
+
 	// TODO: check environment, if safe, just login
 
 	appID, err := uuid.Parse(in.GetAppID())
