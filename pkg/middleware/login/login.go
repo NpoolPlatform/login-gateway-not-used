@@ -15,7 +15,7 @@ import (
 )
 
 func Login(ctx context.Context, in *npool.LoginRequest) (*npool.LoginResponse, error) {
-	// TODO: check man machine spec
+	// TODO: check man machine spec (recaptcha)
 	// TODO: check environment, if safe, just login
 
 	appID, err := uuid.Parse(in.GetAppID())
@@ -62,6 +62,8 @@ func Login(ctx context.Context, in *npool.LoginRequest) (*npool.LoginResponse, e
 		if err != nil {
 			return nil, xerrors.Errorf("fail verify username or password: %v", err)
 		}
+
+		// TODO: correct login type according to account match
 
 		meta.UserInfo = resp.Info
 		meta.UserID = uuid.MustParse(resp.Info.User.ID)
