@@ -1,0 +1,71 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: login-gateway-traefik-app-ingress
+  namespace: kube-system
+  annotations:
+    k8s.kuboard.cn/displayName: login-gateway-traefik-app
+    k8s.kuboard.cn/workload: login-gateway-traefik-app
+    kubernetes.io/ingress.class: "traefik-internet"
+    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-strip-authing-gateway-prefix@kubernetescrd,
+                                                      kube-system-headers-appid-to-body@kubernetescrd,
+                                                      kube-system-headers-userid-to-body@kubernetescrd,
+                                                      kube-system-headers-app-login-token-to-body@kubernetescrd,
+                                                      kube-system-app-rbac-auth@kubernetescrd
+
+spec:
+  rules:
+    - host: api.npool.top
+      http: &http_rules
+        paths:
+          - path: /api/login-gateway/version
+            backend:
+              serviceName: login-gateway
+              servicePort: 50240
+          - path: /api/login-gateway/v1/login
+            backend:
+              serviceName: login-gateway
+              servicePort: 50240
+    - host: api.procyon.top
+      http: *http_rules
+    - host: api.xpool.top
+      http: *http_rules
+
+---
+
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: login-gateway-traefik-app-user-ingress
+  namespace: kube-system
+  annotations:
+    k8s.kuboard.cn/displayName: login-gateway-traefik-app-user
+    k8s.kuboard.cn/workload: login-gateway-traefik-app-user
+    kubernetes.io/ingress.class: "traefik-internet"
+    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-strip-authing-gateway-prefix@kubernetescrd,
+                                                      kube-system-headers-appid-to-body@kubernetescrd,
+                                                      kube-system-headers-userid-to-body@kubernetescrd,
+                                                      kube-system-headers-app-login-token-to-body@kubernetescrd,
+                                                      kube-system-app-rbac-auth@kubernetescrd,
+                                                      kube-system-app-user-role-rbac-auth@kubernetescrd
+
+spec:
+  rules:
+    - host: api.npool.top
+      http: &http_rules
+        paths:
+          - path: /api/login-gateway/v1/logout
+            backend:
+              serviceName: login-gateway
+              servicePort: 50240
+          - path: /api/login-gateway/v1/get/login/histories
+            backend:
+              serviceName: login-gateway
+              servicePort: 50240
+    - host: api.procyon.top
+      http: *http_rules
+    - host: api.xpool.top
+      http: *http_rules
+
