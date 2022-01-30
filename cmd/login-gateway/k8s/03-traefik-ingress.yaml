@@ -8,7 +8,7 @@ metadata:
     k8s.kuboard.cn/workload: login-gateway-traefik-app
     kubernetes.io/ingress.class: "traefik-internet"
     traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
-    traefik.ingress.kubernetes.io/router.middlewares: kube-system-strip-authing-gateway-prefix@kubernetescrd,
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-strip-login-gateway-prefix@kubernetescrd,
                                                       kube-system-common-headers@kubernetescrd,
                                                       kube-system-headers-appid-to-body@kubernetescrd,
                                                       kube-system-headers-userid-to-body@kubernetescrd,
@@ -45,7 +45,7 @@ metadata:
     k8s.kuboard.cn/workload: login-gateway-traefik-app-user
     kubernetes.io/ingress.class: "traefik-internet"
     traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
-    traefik.ingress.kubernetes.io/router.middlewares: kube-system-strip-authing-gateway-prefix@kubernetescrd,
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-strip-login-gateway-prefix@kubernetescrd,
                                                       kube-system-common-headers@kubernetescrd,
                                                       kube-system-headers-appid-to-body@kubernetescrd,
                                                       kube-system-headers-userid-to-body@kubernetescrd,
