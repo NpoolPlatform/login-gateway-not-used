@@ -24,7 +24,7 @@ func appAccountKey(appID uuid.UUID, account, loginType string) string {
 }
 
 func metaToAccountKey(meta *Metadata) string {
-	return appAccountKey(meta.AppID, meta.Account, meta.LoginType)
+	return appAccountKey(meta.AppID, meta.Account, meta.AccountType)
 }
 
 func appUserKey(appID, userID uuid.UUID) string {
@@ -36,8 +36,8 @@ func metaToUserKey(meta *Metadata) string {
 }
 
 type valAppUser struct {
-	Account   string
-	LoginType string
+	Account     string
+	AccountType string
 }
 
 func createCache(ctx context.Context, meta *Metadata) error {
@@ -60,8 +60,8 @@ func createCache(ctx context.Context, meta *Metadata) error {
 	}
 
 	body, err = json.Marshal(&valAppUser{
-		Account:   meta.Account,
-		LoginType: meta.LoginType,
+		Account:     meta.Account,
+		AccountType: meta.AccountType,
 	})
 	if err != nil {
 		return xerrors.Errorf("fail marshal login user meta: %v", err)
@@ -122,7 +122,7 @@ func queryByAppUser(ctx context.Context, appID, userID uuid.UUID) (*Metadata, er
 		return nil, xerrors.Errorf("fail unmarshal val: %v", err)
 	}
 
-	val, err = cli.Get(ctx, appAccountKey(appID, appUser.Account, appUser.LoginType)).Result()
+	val, err = cli.Get(ctx, appAccountKey(appID, appUser.Account, appUser.AccountType)).Result()
 	if err == redis.Nil {
 		return nil, nil
 	} else if err != nil {

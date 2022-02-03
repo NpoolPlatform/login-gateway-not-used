@@ -56,7 +56,7 @@ func Login(ctx context.Context, in *npool.LoginRequest) (*npool.LoginResponse, e
 	cached := false
 	token := ""
 
-	meta, err := queryByAppAccount(ctx, appID, in.GetAccount(), in.GetLoginType())
+	meta, err := queryByAppAccount(ctx, appID, in.GetAccount(), in.GetAccountType())
 	if err != nil {
 		return nil, xerrors.Errorf("fail query login cache by app acount: %v", err)
 	}
@@ -78,7 +78,7 @@ func Login(ctx context.Context, in *npool.LoginRequest) (*npool.LoginResponse, e
 		}
 		meta.AppID = appID
 		meta.Account = in.GetAccount()
-		meta.LoginType = in.GetLoginType()
+		meta.AccountType = in.GetAccountType()
 
 		resp, err := grpc2.VerifyAppUserByAppAccountPassword(ctx, &appusermgrpb.VerifyAppUserByAppAccountPasswordRequest{
 			AppID:        in.GetAppID(),

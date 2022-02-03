@@ -15,13 +15,13 @@ import (
 )
 
 type Metadata struct {
-	AppID     uuid.UUID
-	Account   string
-	LoginType string
-	UserID    uuid.UUID
-	ClientIP  net.IP
-	UserAgent string
-	UserInfo  *appusermgrpb.AppUserInfo
+	AppID       uuid.UUID
+	Account     string
+	AccountType string
+	UserID      uuid.UUID
+	ClientIP    net.IP
+	UserAgent   string
+	UserInfo    *appusermgrpb.AppUserInfo
 }
 
 func MetadataFromContext(ctx context.Context) (*Metadata, error) {
@@ -56,7 +56,7 @@ func (meta *Metadata) ToJWTClaims() jwt.MapClaims {
 	claims["app_id"] = meta.AppID
 	claims["user_id"] = meta.UserID
 	claims["account"] = meta.Account
-	claims["login_type"] = meta.LoginType
+	claims["account_type"] = meta.AccountType
 	claims["client_ip"] = meta.ClientIP
 	claims["user_agent"] = meta.UserAgent
 
@@ -76,9 +76,9 @@ func (meta *Metadata) ValidateJWTClaims(claims jwt.MapClaims) error {
 	if !ok || account != meta.Account {
 		return xerrors.Errorf("invalid account")
 	}
-	loginType, ok := claims["login_type"]
-	if !ok || loginType != meta.LoginType {
-		return xerrors.Errorf("invalid login type")
+	loginType, ok := claims["account_type"]
+	if !ok || loginType != meta.AccountType {
+		return xerrors.Errorf("invalid account type")
 	}
 	clientIP, ok := claims["client_ip"]
 	if !ok || clientIP != meta.ClientIP.String() {
