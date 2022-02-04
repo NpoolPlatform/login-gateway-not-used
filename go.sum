@@ -83,8 +83,8 @@ github.com/NpoolPlatform/message v0.0.0-20220118090327-926885a280ec/go.mod h1:zv
 github.com/NpoolPlatform/message v0.0.0-20220120075427-38182760a780/go.mod h1:tnsf7zHQ5Mv2uG0ezOwCfm/bxluiRW10DeuIl4SjG4Y=
 github.com/NpoolPlatform/message v0.0.0-20220121040326-31d316062cdc/go.mod h1:tnsf7zHQ5Mv2uG0ezOwCfm/bxluiRW10DeuIl4SjG4Y=
 github.com/NpoolPlatform/message v0.0.0-20220126154557-410153a86b92/go.mod h1:tnsf7zHQ5Mv2uG0ezOwCfm/bxluiRW10DeuIl4SjG4Y=
-github.com/NpoolPlatform/message v0.0.0-20220203023938-4d29f9f63124 h1:fSSy/IxZ7gM3u91MjYmpZhTRkYiGsXhlNozvYUZ5zjU=
-github.com/NpoolPlatform/message v0.0.0-20220203023938-4d29f9f63124/go.mod h1:3Wmbn7w0S4h2t/qDr/WYepO3VBKlRAxDGdxsPA9bqQ0=
+github.com/NpoolPlatform/message v0.0.0-20220204080627-ffd073d7abdd h1:Dk83GN3rORw4pa10vtKq78x9Q2sN3mJjlji2vBEXiuU=
+github.com/NpoolPlatform/message v0.0.0-20220204080627-ffd073d7abdd/go.mod h1:3Wmbn7w0S4h2t/qDr/WYepO3VBKlRAxDGdxsPA9bqQ0=
 github.com/NpoolPlatform/user-management v0.0.0-20211209064002-32ab23f7777b/go.mod h1:No1dDB017gQZh1z4fZFWxhZe3GvDxz49mwUKvlY0BCU=
 github.com/NpoolPlatform/user-management v0.0.0-20220118105710-fb22a0c56085/go.mod h1:hfUGs4p0qh6684dTNXxyAo6Zd8dWd5aG4R0g+4uC8Ao=
 github.com/NpoolPlatform/verification-door v0.0.0-20211208034705-d6ede875668c/go.mod h1:MOfpbTnpOt4zM4Sy0w9cOjJKn7sNTsZkuzyVmMInA2k=
