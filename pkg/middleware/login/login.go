@@ -149,7 +149,7 @@ func Logined(ctx context.Context, in *npool.LoginedRequest) (*npool.LoginedRespo
 
 	err = verifyToken(meta, in.GetToken())
 	if err != nil {
-		logger.Sugar().Warnf("user %v token not in cache", in)
+		logger.Sugar().Warnf("user %v token not in cache: %v", in, err)
 		return &npool.LoginedResponse{}, nil
 	}
 
