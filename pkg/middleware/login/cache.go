@@ -20,7 +20,7 @@ const (
 )
 
 func appAccountKey(appID uuid.UUID, account, loginType string) string {
-	return fmt.Sprintf("%v:%v:%v", appID, account, loginType)
+	return fmt.Sprintf("login-%v:%v:%v", appID, account, loginType)
 }
 
 func metaToAccountKey(meta *Metadata) string {
@@ -28,7 +28,7 @@ func metaToAccountKey(meta *Metadata) string {
 }
 
 func appUserKey(appID, userID uuid.UUID) string {
-	return fmt.Sprintf("%v:%v", appID, userID)
+	return fmt.Sprintf("login-%v:%v", appID, userID)
 }
 
 func metaToUserKey(meta *Metadata) string {

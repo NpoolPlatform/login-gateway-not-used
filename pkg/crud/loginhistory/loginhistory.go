@@ -51,7 +51,7 @@ func Create(ctx context.Context, in *npool.LoginHistory) error {
 	return nil
 }
 
-func GetAll(ctx context.Context, in *npool.GetLoginHistoriesRequest) (*npool.GetLoginHistoriesResponse, error) {
+func GetByAppUser(ctx context.Context, in *npool.GetLoginHistoriesRequest) (*npool.GetLoginHistoriesResponse, error) {
 	ctx, cancel := context.WithTimeout(ctx, dbTimeout)
 	defer cancel()
 

@@ -36,7 +36,7 @@ func (s *Server) Logout(ctx context.Context, in *npool.LogoutRequest) (*npool.Lo
 }
 
 func (s *Server) GetLoginHistories(ctx context.Context, in *npool.GetLoginHistoriesRequest) (*npool.GetLoginHistoriesResponse, error) {
-	resp, err := loginhistorycrud.GetAll(ctx, in)
+	resp, err := loginhistorycrud.GetByAppUser(ctx, in)
 	if err != nil {
 		logger.Sugar().Errorf("fail get login history: %v", err)
 		return &npool.GetLoginHistoriesResponse{}, status.Error(codes.Internal, err.Error())

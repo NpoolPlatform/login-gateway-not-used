@@ -5,6 +5,7 @@ import (
 	"net"
 	"os"
 
+	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	appusermgrpb "github.com/NpoolPlatform/message/npool/appusermgr"
 	"github.com/dgrijalva/jwt-go"
 	"google.golang.org/grpc/metadata"
@@ -43,6 +44,8 @@ func MetadataFromContext(ctx context.Context) (*Metadata, error) {
 			userAgent = agents[0]
 		}
 	}
+
+	logger.Sugar().Infof("pass client ip %v | %v from meta %v", clientIP, net.ParseIP(clientIP), meta)
 
 	return &Metadata{
 		ClientIP:  net.ParseIP(clientIP),
