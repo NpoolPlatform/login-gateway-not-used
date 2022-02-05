@@ -46,8 +46,6 @@ func MetadataFromContext(ctx context.Context) (*Metadata, error) {
 		}
 	}
 
-	logger.Sugar().Infof("pass client ip %v | %v from meta %v", clientIP, net.ParseIP(clientIP), meta)
-
 	return &Metadata{
 		ClientIP:  net.ParseIP(clientIP),
 		UserAgent: userAgent,
