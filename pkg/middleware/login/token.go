@@ -4,6 +4,7 @@ import (
 	"context"
 	"net"
 	"os"
+	"strings"
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	appusermgrpb "github.com/NpoolPlatform/message/npool/appusermgr"
@@ -34,7 +35,7 @@ func MetadataFromContext(ctx context.Context) (*Metadata, error) {
 	clientIP := ""
 	if forwards, ok := meta["x-forwarded-for"]; ok {
 		if len(forwards) > 0 {
-			clientIP = forwards[0]
+			clientIP = strings.Split(forwards[0], ",")[0]
 		}
 	}
 
