@@ -57,7 +57,13 @@ func GetByAppUser(ctx context.Context, in *npool.GetLoginHistoriesRequest) (*npo
 			continue
 		}
 
-		rc := resp.Result().(*ipResp)
+		rc, ok := resp.Result().(*ipResp)
+		if !ok {
+			logger.Sugar().Warnf("fail get login location: %v", rc.Reason)
+			infos = append(infos, info)
+			continue
+		}
+
 		if rc.Error {
 			logger.Sugar().Warnf("fail get login location: %v", rc.Reason)
 			info.Location = rc.Reason
