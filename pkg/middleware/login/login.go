@@ -3,6 +3,7 @@ package login
 import (
 	"context"
 
+	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	loginhistorycrud "github.com/NpoolPlatform/login-gateway/pkg/crud/loginhistory"
 	grpc2 "github.com/NpoolPlatform/login-gateway/pkg/grpc"
 	npool "github.com/NpoolPlatform/message/npool/logingateway"
@@ -142,11 +143,13 @@ func Logined(ctx context.Context, in *npool.LoginedRequest) (*npool.LoginedRespo
 		return nil, xerrors.Errorf("fail query login cache by app user: %v", err)
 	}
 	if meta == nil {
+		logger.Sugar().Warnf("user %v not in cache", in)
 		return &npool.LoginedResponse{}, nil
 	}
 
 	err = verifyToken(meta, in.GetToken())
 	if err != nil {
+		logger.Sugar().Warnf("user %v token not in cache", in)
 		return &npool.LoginedResponse{}, nil
 	}
 
