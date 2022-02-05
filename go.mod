@@ -5,10 +5,10 @@ go 1.16
 require (
 	entgo.io/ent v0.10.0
 	github.com/NpoolPlatform/api-manager v0.0.0-20220121051827-18c807c114dc
-	github.com/NpoolPlatform/appuser-manager v0.0.0-20220126160509-d91593fa9fa2
-	github.com/NpoolPlatform/go-service-framework v0.0.0-20220127085959-4940540d8042
-	github.com/NpoolPlatform/message v0.0.0-20220205083131-e4c301ba51d2
-	github.com/NpoolPlatform/verification-door v0.0.0-20220129101136-603c53301f4c
+	github.com/NpoolPlatform/appuser-manager v0.0.0-20220129103404-3f7941df7148
+	github.com/NpoolPlatform/go-service-framework v0.0.0-20220127101433-3def4e496433
+	github.com/NpoolPlatform/message v0.0.0-20220205093001-decb30c7827f
+	github.com/NpoolPlatform/third-gateway v0.0.0-20220205094704-a585d53bd025
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-redis/redis/v8 v8.11.4
 	github.com/go-resty/resty/v2 v2.7.0

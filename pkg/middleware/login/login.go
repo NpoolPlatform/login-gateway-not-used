@@ -10,7 +10,7 @@ import (
 	appusermgrconst "github.com/NpoolPlatform/appuser-manager/pkg/const"
 	appusermgrpb "github.com/NpoolPlatform/message/npool/appusermgr"
 
-	verificationpb "github.com/NpoolPlatform/message/npool/verification"
+	thirdgwpb "github.com/NpoolPlatform/message/npool/thirdgateway"
 
 	"github.com/google/uuid"
 
@@ -30,15 +30,15 @@ func Login(ctx context.Context, in *npool.LoginRequest) (*npool.LoginResponse, e
 			return nil, xerrors.Errorf("miss recaptcha")
 		}
 
-		resp, err := grpc2.VerifyGoogleRecaptcha(ctx, &verificationpb.VerifyGoogleRecaptchaRequest{
-			Response: in.GetManMachineSpec(),
+		resp, err := grpc2.VerifyGoogleRecaptchaV3(ctx, &thirdgwpb.VerifyGoogleRecaptchaV3Request{
+			RecaptchaToken: in.GetManMachineSpec(),
 		})
 		if err != nil {
 			return nil, xerrors.Errorf("fail verify google recaptcha: %v", err)
 		}
 
-		if !resp.Info {
-			return nil, xerrors.Errorf("invalid google recaptcha verification response")
+		if resp.Code < 0 {
+			return nil, xerrors.Errorf("invalid google recaptcha response")
 		}
 	}
 

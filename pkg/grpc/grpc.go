@@ -9,8 +9,8 @@ import (
 	appusermgrconst "github.com/NpoolPlatform/appuser-manager/pkg/message/const" //nolint
 	appusermgrpb "github.com/NpoolPlatform/message/npool/appusermgr"
 
-	verificationpb "github.com/NpoolPlatform/message/npool/verification"
-	verificationconst "github.com/NpoolPlatform/verification-door/pkg/message/const"
+	thirdgwpb "github.com/NpoolPlatform/message/npool/thirdgateway"
+	thirdgwconst "github.com/NpoolPlatform/third-gateway/pkg/message/const"
 
 	"golang.org/x/xerrors"
 )
@@ -51,18 +51,18 @@ func GetAppInfo(ctx context.Context, in *appusermgrpb.GetAppInfoRequest) (*appus
 
 // =======================================================================================================================
 
-func VerifyGoogleRecaptcha(ctx context.Context, in *verificationpb.VerifyGoogleRecaptchaRequest) (*verificationpb.VerifyGoogleRecaptchaResponse, error) {
-	conn, err := grpc2.GetGRPCConn(verificationconst.ServiceName, grpc2.GRPCTAG)
+func VerifyGoogleRecaptchaV3(ctx context.Context, in *thirdgwpb.VerifyGoogleRecaptchaV3Request) (*thirdgwpb.VerifyGoogleRecaptchaV3Response, error) {
+	conn, err := grpc2.GetGRPCConn(thirdgwconst.ServiceName, grpc2.GRPCTAG)
 	if err != nil {
-		return nil, xerrors.Errorf("fail get verification connection: %v", err)
+		return nil, xerrors.Errorf("fail get third gateway connection: %v", err)
 	}
 
 	defer conn.Close()
 
-	client := verificationpb.NewVerificationDoorClient(conn)
+	client := thirdgwpb.NewThirdGatewayClient(conn)
 
 	ctx, cancel := context.WithTimeout(ctx, grpcTimeout)
 	defer cancel()
 
-	return client.VerifyGoogleRecaptcha(ctx, in)
+	return client.VerifyGoogleRecaptchaV3(ctx, in)
 }
