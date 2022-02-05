@@ -32,7 +32,12 @@ func (s *Server) Logined(ctx context.Context, in *npool.LoginedRequest) (*npool.
 }
 
 func (s *Server) Logout(ctx context.Context, in *npool.LogoutRequest) (*npool.LogoutResponse, error) {
-	return nil, nil
+	resp, err := mw.Logout(ctx, in)
+	if err != nil {
+		logger.Sugar().Errorf("fail logout: %v", err)
+		return &npool.LogoutResponse{}, status.Error(codes.Internal, err.Error())
+	}
+	return resp, nil
 }
 
 func (s *Server) GetLoginHistories(ctx context.Context, in *npool.GetLoginHistoriesRequest) (*npool.GetLoginHistoriesResponse, error) {
