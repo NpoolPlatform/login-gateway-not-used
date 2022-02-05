@@ -26,7 +26,7 @@ func Login(ctx context.Context, in *npool.LoginRequest) (*npool.LoginResponse, e
 		return nil, xerrors.Errorf("fail get app info: %v", err)
 	}
 
-	if resp.Info.Ctrl != nil && resp.Info.Ctrl.RecaptchaMethod == appusermgrconst.RecaptchaGoogleV3 {
+	if false && resp.Info.Ctrl != nil && resp.Info.Ctrl.RecaptchaMethod == appusermgrconst.RecaptchaGoogleV3 {
 		if in.GetManMachineSpec() == "" {
 			return nil, xerrors.Errorf("miss recaptcha")
 		}

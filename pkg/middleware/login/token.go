@@ -6,7 +6,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	appusermgrpb "github.com/NpoolPlatform/message/npool/appusermgr"
 	"github.com/dgrijalva/jwt-go"
 	"google.golang.org/grpc/metadata"
@@ -67,27 +66,27 @@ func (meta *Metadata) ToJWTClaims() jwt.MapClaims {
 
 func (meta *Metadata) ValidateJWTClaims(claims jwt.MapClaims) error {
 	appID, ok := claims["app_id"]
-	if !ok || appID != meta.AppID {
+	if !ok || appID.(string) != meta.AppID.String() {
 		return xerrors.Errorf("invalid app id")
 	}
 	userID, ok := claims["user_id"]
-	if !ok || userID != meta.UserID {
+	if !ok || userID.(string) != meta.UserID.String() {
 		return xerrors.Errorf("invalid user id")
 	}
 	account, ok := claims["account"]
-	if !ok || account != meta.Account {
+	if !ok || account.(string) != meta.Account {
 		return xerrors.Errorf("invalid account")
 	}
 	loginType, ok := claims["account_type"]
-	if !ok || loginType != meta.AccountType {
+	if !ok || loginType.(string) != meta.AccountType {
 		return xerrors.Errorf("invalid account type")
 	}
 	clientIP, ok := claims["client_ip"]
-	if !ok || clientIP != meta.ClientIP.String() {
+	if !ok || clientIP.(string) != meta.ClientIP.String() {
 		return xerrors.Errorf("invalid client ip")
 	}
 	userAgent, ok := claims["user_agent"]
-	if !ok || userAgent != meta.UserAgent {
+	if !ok || userAgent.(string) != meta.UserAgent {
 		return xerrors.Errorf("invalid user agent")
 	}
 	return nil
@@ -133,10 +132,9 @@ func verifyToken(meta *Metadata, token string) error {
 		return xerrors.Errorf("type seertion fail of jwt token")
 	}
 
-	logger.Sugar().Infof("verify %v vs %v for token", claims, meta, token)
 	err = meta.ValidateJWTClaims(claims)
 	if err != nil {
-		return xerrors.Errorf("invalid token")
+		return xerrors.Errorf("invalid token: %v", err)
 	}
 
 	return nil
