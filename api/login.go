@@ -5,8 +5,8 @@ import (
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 
-	loginhistorycrud "github.com/NpoolPlatform/login-gateway/pkg/crud/loginhistory"
 	mw "github.com/NpoolPlatform/login-gateway/pkg/middleware/login"
+	loginhistorymw "github.com/NpoolPlatform/login-gateway/pkg/middleware/loginhistory"
 	npool "github.com/NpoolPlatform/message/npool/logingateway"
 
 	"google.golang.org/grpc/codes"
@@ -36,7 +36,7 @@ func (s *Server) Logout(ctx context.Context, in *npool.LogoutRequest) (*npool.Lo
 }
 
 func (s *Server) GetLoginHistories(ctx context.Context, in *npool.GetLoginHistoriesRequest) (*npool.GetLoginHistoriesResponse, error) {
-	resp, err := loginhistorycrud.GetByAppUser(ctx, in)
+	resp, err := loginhistorymw.GetByAppUser(ctx, in)
 	if err != nil {
 		logger.Sugar().Errorf("fail get login history: %v", err)
 		return &npool.GetLoginHistoriesResponse{}, status.Error(codes.Internal, err.Error())

@@ -37,6 +37,7 @@ type LoginHistoryMutation struct {
 	user_id       *uuid.UUID
 	client_ip     *string
 	user_agent    *string
+	location      *string
 	create_at     *uint32
 	addcreate_at  *int32
 	clearedFields map[string]struct{}
@@ -293,6 +294,55 @@ func (m *LoginHistoryMutation) ResetUserAgent() {
 	m.user_agent = nil
 }
 
+// SetLocation sets the "location" field.
+func (m *LoginHistoryMutation) SetLocation(s string) {
+	m.location = &s
+}
+
+// Location returns the value of the "location" field in the mutation.
+func (m *LoginHistoryMutation) Location() (r string, exists bool) {
+	v := m.location
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLocation returns the old "location" field's value of the LoginHistory entity.
+// If the LoginHistory object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *LoginHistoryMutation) OldLocation(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLocation is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLocation requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLocation: %w", err)
+	}
+	return oldValue.Location, nil
+}
+
+// ClearLocation clears the value of the "location" field.
+func (m *LoginHistoryMutation) ClearLocation() {
+	m.location = nil
+	m.clearedFields[loginhistory.FieldLocation] = struct{}{}
+}
+
+// LocationCleared returns if the "location" field was cleared in this mutation.
+func (m *LoginHistoryMutation) LocationCleared() bool {
+	_, ok := m.clearedFields[loginhistory.FieldLocation]
+	return ok
+}
+
+// ResetLocation resets all changes to the "location" field.
+func (m *LoginHistoryMutation) ResetLocation() {
+	m.location = nil
+	delete(m.clearedFields, loginhistory.FieldLocation)
+}
+
 // SetCreateAt sets the "create_at" field.
 func (m *LoginHistoryMutation) SetCreateAt(u uint32) {
 	m.create_at = &u
@@ -368,7 +418,7 @@ func (m *LoginHistoryMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *LoginHistoryMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 6)
 	if m.app_id != nil {
 		fields = append(fields, loginhistory.FieldAppID)
 	}
@@ -380,6 +430,9 @@ func (m *LoginHistoryMutation) Fields() []string {
 	}
 	if m.user_agent != nil {
 		fields = append(fields, loginhistory.FieldUserAgent)
+	}
+	if m.location != nil {
+		fields = append(fields, loginhistory.FieldLocation)
 	}
 	if m.create_at != nil {
 		fields = append(fields, loginhistory.FieldCreateAt)
@@ -400,6 +453,8 @@ func (m *LoginHistoryMutation) Field(name string) (ent.Value, bool) {
 		return m.ClientIP()
 	case loginhistory.FieldUserAgent:
 		return m.UserAgent()
+	case loginhistory.FieldLocation:
+		return m.Location()
 	case loginhistory.FieldCreateAt:
 		return m.CreateAt()
 	}
@@ -419,6 +474,8 @@ func (m *LoginHistoryMutation) OldField(ctx context.Context, name string) (ent.V
 		return m.OldClientIP(ctx)
 	case loginhistory.FieldUserAgent:
 		return m.OldUserAgent(ctx)
+	case loginhistory.FieldLocation:
+		return m.OldLocation(ctx)
 	case loginhistory.FieldCreateAt:
 		return m.OldCreateAt(ctx)
 	}
@@ -457,6 +514,13 @@ func (m *LoginHistoryMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUserAgent(v)
+		return nil
+	case loginhistory.FieldLocation:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLocation(v)
 		return nil
 	case loginhistory.FieldCreateAt:
 		v, ok := value.(uint32)
@@ -509,7 +573,11 @@ func (m *LoginHistoryMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *LoginHistoryMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(loginhistory.FieldLocation) {
+		fields = append(fields, loginhistory.FieldLocation)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -522,6 +590,11 @@ func (m *LoginHistoryMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *LoginHistoryMutation) ClearField(name string) error {
+	switch name {
+	case loginhistory.FieldLocation:
+		m.ClearLocation()
+		return nil
+	}
 	return fmt.Errorf("unknown LoginHistory nullable field %s", name)
 }
 
@@ -540,6 +613,9 @@ func (m *LoginHistoryMutation) ResetField(name string) error {
 		return nil
 	case loginhistory.FieldUserAgent:
 		m.ResetUserAgent()
+		return nil
+	case loginhistory.FieldLocation:
+		m.ResetLocation()
 		return nil
 	case loginhistory.FieldCreateAt:
 		m.ResetCreateAt()

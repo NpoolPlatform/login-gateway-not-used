@@ -47,6 +47,20 @@ func (lhc *LoginHistoryCreate) SetUserAgent(s string) *LoginHistoryCreate {
 	return lhc
 }
 
+// SetLocation sets the "location" field.
+func (lhc *LoginHistoryCreate) SetLocation(s string) *LoginHistoryCreate {
+	lhc.mutation.SetLocation(s)
+	return lhc
+}
+
+// SetNillableLocation sets the "location" field if the given value is not nil.
+func (lhc *LoginHistoryCreate) SetNillableLocation(s *string) *LoginHistoryCreate {
+	if s != nil {
+		lhc.SetLocation(*s)
+	}
+	return lhc
+}
+
 // SetCreateAt sets the "create_at" field.
 func (lhc *LoginHistoryCreate) SetCreateAt(u uint32) *LoginHistoryCreate {
 	lhc.mutation.SetCreateAt(u)
@@ -242,6 +256,14 @@ func (lhc *LoginHistoryCreate) createSpec() (*LoginHistory, *sqlgraph.CreateSpec
 		})
 		_node.UserAgent = value
 	}
+	if value, ok := lhc.mutation.Location(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: loginhistory.FieldLocation,
+		})
+		_node.Location = value
+	}
 	if value, ok := lhc.mutation.CreateAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeUint32,
@@ -349,6 +371,24 @@ func (u *LoginHistoryUpsert) SetUserAgent(v string) *LoginHistoryUpsert {
 // UpdateUserAgent sets the "user_agent" field to the value that was provided on create.
 func (u *LoginHistoryUpsert) UpdateUserAgent() *LoginHistoryUpsert {
 	u.SetExcluded(loginhistory.FieldUserAgent)
+	return u
+}
+
+// SetLocation sets the "location" field.
+func (u *LoginHistoryUpsert) SetLocation(v string) *LoginHistoryUpsert {
+	u.Set(loginhistory.FieldLocation, v)
+	return u
+}
+
+// UpdateLocation sets the "location" field to the value that was provided on create.
+func (u *LoginHistoryUpsert) UpdateLocation() *LoginHistoryUpsert {
+	u.SetExcluded(loginhistory.FieldLocation)
+	return u
+}
+
+// ClearLocation clears the value of the "location" field.
+func (u *LoginHistoryUpsert) ClearLocation() *LoginHistoryUpsert {
+	u.SetNull(loginhistory.FieldLocation)
 	return u
 }
 
@@ -473,6 +513,27 @@ func (u *LoginHistoryUpsertOne) SetUserAgent(v string) *LoginHistoryUpsertOne {
 func (u *LoginHistoryUpsertOne) UpdateUserAgent() *LoginHistoryUpsertOne {
 	return u.Update(func(s *LoginHistoryUpsert) {
 		s.UpdateUserAgent()
+	})
+}
+
+// SetLocation sets the "location" field.
+func (u *LoginHistoryUpsertOne) SetLocation(v string) *LoginHistoryUpsertOne {
+	return u.Update(func(s *LoginHistoryUpsert) {
+		s.SetLocation(v)
+	})
+}
+
+// UpdateLocation sets the "location" field to the value that was provided on create.
+func (u *LoginHistoryUpsertOne) UpdateLocation() *LoginHistoryUpsertOne {
+	return u.Update(func(s *LoginHistoryUpsert) {
+		s.UpdateLocation()
+	})
+}
+
+// ClearLocation clears the value of the "location" field.
+func (u *LoginHistoryUpsertOne) ClearLocation() *LoginHistoryUpsertOne {
+	return u.Update(func(s *LoginHistoryUpsert) {
+		s.ClearLocation()
 	})
 }
 
@@ -766,6 +827,27 @@ func (u *LoginHistoryUpsertBulk) SetUserAgent(v string) *LoginHistoryUpsertBulk 
 func (u *LoginHistoryUpsertBulk) UpdateUserAgent() *LoginHistoryUpsertBulk {
 	return u.Update(func(s *LoginHistoryUpsert) {
 		s.UpdateUserAgent()
+	})
+}
+
+// SetLocation sets the "location" field.
+func (u *LoginHistoryUpsertBulk) SetLocation(v string) *LoginHistoryUpsertBulk {
+	return u.Update(func(s *LoginHistoryUpsert) {
+		s.SetLocation(v)
+	})
+}
+
+// UpdateLocation sets the "location" field to the value that was provided on create.
+func (u *LoginHistoryUpsertBulk) UpdateLocation() *LoginHistoryUpsertBulk {
+	return u.Update(func(s *LoginHistoryUpsert) {
+		s.UpdateLocation()
+	})
+}
+
+// ClearLocation clears the value of the "location" field.
+func (u *LoginHistoryUpsertBulk) ClearLocation() *LoginHistoryUpsertBulk {
+	return u.Update(func(s *LoginHistoryUpsert) {
+		s.ClearLocation()
 	})
 }
 

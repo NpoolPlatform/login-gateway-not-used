@@ -15,7 +15,7 @@ func init() {
 	loginhistoryFields := schema.LoginHistory{}.Fields()
 	_ = loginhistoryFields
 	// loginhistoryDescCreateAt is the schema descriptor for create_at field.
-	loginhistoryDescCreateAt := loginhistoryFields[5].Descriptor()
+	loginhistoryDescCreateAt := loginhistoryFields[6].Descriptor()
 	// loginhistory.DefaultCreateAt holds the default value on creation for the create_at field.
 	loginhistory.DefaultCreateAt = loginhistoryDescCreateAt.Default.(func() uint32)
 	// loginhistoryDescID is the schema descriptor for id field.

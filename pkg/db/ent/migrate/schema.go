@@ -15,6 +15,7 @@ var (
 		{Name: "user_id", Type: field.TypeUUID},
 		{Name: "client_ip", Type: field.TypeString},
 		{Name: "user_agent", Type: field.TypeString},
+		{Name: "location", Type: field.TypeString, Nullable: true},
 		{Name: "create_at", Type: field.TypeUint32},
 	}
 	// LoginHistoriesTable holds the schema information for the "login_histories" table.

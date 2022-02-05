@@ -24,6 +24,8 @@ type LoginHistory struct {
 	ClientIP string `json:"client_ip,omitempty"`
 	// UserAgent holds the value of the "user_agent" field.
 	UserAgent string `json:"user_agent,omitempty"`
+	// Location holds the value of the "location" field.
+	Location string `json:"location,omitempty"`
 	// CreateAt holds the value of the "create_at" field.
 	CreateAt uint32 `json:"create_at,omitempty"`
 }
@@ -35,7 +37,7 @@ func (*LoginHistory) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case loginhistory.FieldCreateAt:
 			values[i] = new(sql.NullInt64)
-		case loginhistory.FieldClientIP, loginhistory.FieldUserAgent:
+		case loginhistory.FieldClientIP, loginhistory.FieldUserAgent, loginhistory.FieldLocation:
 			values[i] = new(sql.NullString)
 		case loginhistory.FieldID, loginhistory.FieldAppID, loginhistory.FieldUserID:
 			values[i] = new(uuid.UUID)
@@ -84,6 +86,12 @@ func (lh *LoginHistory) assignValues(columns []string, values []interface{}) err
 			} else if value.Valid {
 				lh.UserAgent = value.String
 			}
+		case loginhistory.FieldLocation:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field location", values[i])
+			} else if value.Valid {
+				lh.Location = value.String
+			}
 		case loginhistory.FieldCreateAt:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field create_at", values[i])
@@ -126,6 +134,8 @@ func (lh *LoginHistory) String() string {
 	builder.WriteString(lh.ClientIP)
 	builder.WriteString(", user_agent=")
 	builder.WriteString(lh.UserAgent)
+	builder.WriteString(", location=")
+	builder.WriteString(lh.Location)
 	builder.WriteString(", create_at=")
 	builder.WriteString(fmt.Sprintf("%v", lh.CreateAt))
 	builder.WriteByte(')')

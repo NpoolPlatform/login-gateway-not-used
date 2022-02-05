@@ -19,6 +19,8 @@ const (
 	FieldClientIP = "client_ip"
 	// FieldUserAgent holds the string denoting the user_agent field in the database.
 	FieldUserAgent = "user_agent"
+	// FieldLocation holds the string denoting the location field in the database.
+	FieldLocation = "location"
 	// FieldCreateAt holds the string denoting the create_at field in the database.
 	FieldCreateAt = "create_at"
 	// Table holds the table name of the loginhistory in the database.
@@ -32,6 +34,7 @@ var Columns = []string{
 	FieldUserID,
 	FieldClientIP,
 	FieldUserAgent,
+	FieldLocation,
 	FieldCreateAt,
 }
 

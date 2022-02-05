@@ -52,6 +52,26 @@ func (lhu *LoginHistoryUpdate) SetUserAgent(s string) *LoginHistoryUpdate {
 	return lhu
 }
 
+// SetLocation sets the "location" field.
+func (lhu *LoginHistoryUpdate) SetLocation(s string) *LoginHistoryUpdate {
+	lhu.mutation.SetLocation(s)
+	return lhu
+}
+
+// SetNillableLocation sets the "location" field if the given value is not nil.
+func (lhu *LoginHistoryUpdate) SetNillableLocation(s *string) *LoginHistoryUpdate {
+	if s != nil {
+		lhu.SetLocation(*s)
+	}
+	return lhu
+}
+
+// ClearLocation clears the value of the "location" field.
+func (lhu *LoginHistoryUpdate) ClearLocation() *LoginHistoryUpdate {
+	lhu.mutation.ClearLocation()
+	return lhu
+}
+
 // SetCreateAt sets the "create_at" field.
 func (lhu *LoginHistoryUpdate) SetCreateAt(u uint32) *LoginHistoryUpdate {
 	lhu.mutation.ResetCreateAt()
@@ -178,6 +198,19 @@ func (lhu *LoginHistoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: loginhistory.FieldUserAgent,
 		})
 	}
+	if value, ok := lhu.mutation.Location(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: loginhistory.FieldLocation,
+		})
+	}
+	if lhu.mutation.LocationCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: loginhistory.FieldLocation,
+		})
+	}
 	if value, ok := lhu.mutation.CreateAt(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeUint32,
@@ -232,6 +265,26 @@ func (lhuo *LoginHistoryUpdateOne) SetClientIP(s string) *LoginHistoryUpdateOne 
 // SetUserAgent sets the "user_agent" field.
 func (lhuo *LoginHistoryUpdateOne) SetUserAgent(s string) *LoginHistoryUpdateOne {
 	lhuo.mutation.SetUserAgent(s)
+	return lhuo
+}
+
+// SetLocation sets the "location" field.
+func (lhuo *LoginHistoryUpdateOne) SetLocation(s string) *LoginHistoryUpdateOne {
+	lhuo.mutation.SetLocation(s)
+	return lhuo
+}
+
+// SetNillableLocation sets the "location" field if the given value is not nil.
+func (lhuo *LoginHistoryUpdateOne) SetNillableLocation(s *string) *LoginHistoryUpdateOne {
+	if s != nil {
+		lhuo.SetLocation(*s)
+	}
+	return lhuo
+}
+
+// ClearLocation clears the value of the "location" field.
+func (lhuo *LoginHistoryUpdateOne) ClearLocation() *LoginHistoryUpdateOne {
+	lhuo.mutation.ClearLocation()
 	return lhuo
 }
 
@@ -383,6 +436,19 @@ func (lhuo *LoginHistoryUpdateOne) sqlSave(ctx context.Context) (_node *LoginHis
 			Type:   field.TypeString,
 			Value:  value,
 			Column: loginhistory.FieldUserAgent,
+		})
+	}
+	if value, ok := lhuo.mutation.Location(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: loginhistory.FieldLocation,
+		})
+	}
+	if lhuo.mutation.LocationCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: loginhistory.FieldLocation,
 		})
 	}
 	if value, ok := lhuo.mutation.CreateAt(); ok {

@@ -43,9 +43,36 @@ func Create(ctx context.Context, in *npool.LoginHistory) error {
 		SetUserID(userID).
 		SetClientIP(in.GetClientIP()).
 		SetUserAgent(in.GetUserAgent()).
+		SetLocation(in.GetLocation()).
 		Save(ctx)
 	if err != nil {
 		return xerrors.Errorf("fail create login history: %v", err)
+	}
+
+	return nil
+}
+
+func Update(ctx context.Context, in *npool.LoginHistory) error {
+	ctx, cancel := context.WithTimeout(ctx, dbTimeout)
+	defer cancel()
+
+	cli, err := db.Client()
+	if err != nil {
+		return xerrors.Errorf("fail get db client: %v", err)
+	}
+
+	id, err := uuid.Parse(in.GetID())
+	if err != nil {
+		return xerrors.Errorf("invalid id: %v", err)
+	}
+
+	_, err = cli.
+		LoginHistory.
+		UpdateOneID(id).
+		SetLocation(in.GetLocation()).
+		Save(ctx)
+	if err != nil {
+		return xerrors.Errorf("fail update clogin history: %v", err)
 	}
 
 	return nil
@@ -93,6 +120,7 @@ func GetByAppUser(ctx context.Context, in *npool.GetLoginHistoriesRequest) (*npo
 			ClientIP:  info.ClientIP,
 			UserAgent: info.UserAgent,
 			CreateAt:  info.CreateAt,
+			Location:  info.Location,
 		})
 	}
 
