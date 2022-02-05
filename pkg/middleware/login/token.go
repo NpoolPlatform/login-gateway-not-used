@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	appusermgrpb "github.com/NpoolPlatform/message/npool/appusermgr"
 	"github.com/dgrijalva/jwt-go"
 	"google.golang.org/grpc/metadata"
@@ -132,6 +133,7 @@ func verifyToken(meta *Metadata, token string) error {
 		return xerrors.Errorf("type seertion fail of jwt token")
 	}
 
+	logger.Sugar().Infof("verify %v vs %v for token", claims, meta, token)
 	err = meta.ValidateJWTClaims(claims)
 	if err != nil {
 		return xerrors.Errorf("invalid token")
