@@ -31,6 +31,15 @@ func (s *Server) Logined(ctx context.Context, in *npool.LoginedRequest) (*npool.
 	return resp, nil
 }
 
+func (s *Server) UpdateCache(ctx context.Context, in *npool.UpdateCacheRequest) (*npool.UpdateCacheResponse, error) {
+	resp, err := mw.UpdateCache(ctx, in)
+	if err != nil {
+		logger.Sugar().Errorf("fail update cache: %v", err)
+		return &npool.UpdateCacheResponse{}, status.Error(codes.Internal, err.Error())
+	}
+	return resp, nil
+}
+
 func (s *Server) Logout(ctx context.Context, in *npool.LogoutRequest) (*npool.LogoutResponse, error) {
 	resp, err := mw.Logout(ctx, in)
 	if err != nil {
