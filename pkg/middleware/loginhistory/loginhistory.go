@@ -9,14 +9,12 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/logingateway"
 
 	"github.com/go-resty/resty/v2"
-
-	"golang.org/x/xerrors"
 )
 
 func GetByAppUser(ctx context.Context, in *npool.GetLoginHistoriesRequest) (*npool.GetLoginHistoriesResponse, error) {
 	resp, err := loginhistorycrud.GetByAppUser(ctx, in)
 	if err != nil {
-		return nil, xerrors.Errorf("fail get login history: %v", err)
+		return nil, fmt.Errorf("fail get login history: %v", err)
 	}
 
 	infos := []*npool.LoginHistory{}

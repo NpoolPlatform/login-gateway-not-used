@@ -2,20 +2,20 @@ package login
 
 import (
 	"context"
+	"fmt"
 
+	appusermgrconst "github.com/NpoolPlatform/appuser-manager/pkg/const"
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	loginhistorycrud "github.com/NpoolPlatform/login-gateway/pkg/crud/loginhistory"
 	grpc2 "github.com/NpoolPlatform/login-gateway/pkg/grpc"
-	npool "github.com/NpoolPlatform/message/npool/logingateway"
-
-	appusermgrconst "github.com/NpoolPlatform/appuser-manager/pkg/const"
 	appusermgrpb "github.com/NpoolPlatform/message/npool/appusermgr"
+	npool "github.com/NpoolPlatform/message/npool/logingateway"
+	thirdlogingwpb "github.com/NpoolPlatform/message/npool/third-login-gateway"
+	thirdloginauth "github.com/NpoolPlatform/third-login-gateway/pkg/auth"
 
 	thirdgwpb "github.com/NpoolPlatform/message/npool/thirdgateway"
 
 	"github.com/google/uuid"
-
-	"golang.org/x/xerrors"
 )
 
 func Login(ctx context.Context, in *npool.LoginRequest) (*npool.LoginResponse, error) { //nolint
@@ -23,23 +23,23 @@ func Login(ctx context.Context, in *npool.LoginRequest) (*npool.LoginResponse, e
 		ID: in.GetAppID(),
 	})
 	if err != nil {
-		return nil, xerrors.Errorf("fail get app info: %v", err)
+		return nil, fmt.Errorf("fail get app info: %v", err)
 	}
 
 	if false && resp.Info.Ctrl != nil && resp.Info.Ctrl.RecaptchaMethod == appusermgrconst.RecaptchaGoogleV3 {
 		if in.GetManMachineSpec() == "" {
-			return nil, xerrors.Errorf("miss recaptcha")
+			return nil, fmt.Errorf("miss recaptcha")
 		}
 
 		resp, err := grpc2.VerifyGoogleRecaptchaV3(ctx, &thirdgwpb.VerifyGoogleRecaptchaV3Request{
 			RecaptchaToken: in.GetManMachineSpec(),
 		})
 		if err != nil {
-			return nil, xerrors.Errorf("fail verify google recaptcha: %v", err)
+			return nil, fmt.Errorf("fail verify google recaptcha: %v", err)
 		}
 
 		if resp.Code < 0 {
-			return nil, xerrors.Errorf("invalid google recaptcha response")
+			return nil, fmt.Errorf("invalid google recaptcha response")
 		}
 	}
 
@@ -47,11 +47,11 @@ func Login(ctx context.Context, in *npool.LoginRequest) (*npool.LoginResponse, e
 
 	appID, err := uuid.Parse(in.GetAppID())
 	if err != nil {
-		return nil, xerrors.Errorf("invalid app id: %v", err)
+		return nil, fmt.Errorf("invalid app id: %v", err)
 	}
 
 	if in.GetAccount() == "" {
-		return nil, xerrors.Errorf("invalid account: %v", err)
+		return nil, fmt.Errorf("invalid account: %v", err)
 	}
 
 	cached := false
@@ -59,7 +59,7 @@ func Login(ctx context.Context, in *npool.LoginRequest) (*npool.LoginResponse, e
 
 	meta, err := queryByAppAccount(ctx, appID, in.GetAccount(), in.GetAccountType())
 	if err != nil {
-		return nil, xerrors.Errorf("fail query login cache by app acount: %v", err)
+		return nil, fmt.Errorf("fail query login cache by app acount: %v", err)
 	}
 	if meta != nil {
 		if in.GetToken() != "" {
@@ -75,35 +75,52 @@ func Login(ctx context.Context, in *npool.LoginRequest) (*npool.LoginResponse, e
 	if !cached {
 		meta, err = MetadataFromContext(ctx)
 		if err != nil {
-			return nil, xerrors.Errorf("fail create login metadata: %v", err)
+			return nil, fmt.Errorf("fail create login metadata: %v", err)
 		}
 		meta.AppID = appID
 		meta.Account = in.GetAccount()
 		meta.AccountType = in.GetAccountType()
-
-		resp, err := grpc2.VerifyAppUserByAppAccountPassword(ctx, &appusermgrpb.VerifyAppUserByAppAccountPasswordRequest{
-			AppID:        in.GetAppID(),
-			Account:      in.GetAccount(),
-			PasswordHash: in.GetPasswordHash(),
-		})
-		if err != nil {
-			return nil, xerrors.Errorf("fail verify username or password: %v", err)
+		_, ok := thirdloginauth.ThirdMap[in.GetAccountType()]
+		if !ok {
+			resp, err := grpc2.VerifyAppUserByAppAccountPassword(ctx, &appusermgrpb.VerifyAppUserByAppAccountPasswordRequest{
+				AppID:        in.GetAppID(),
+				Account:      in.GetAccount(),
+				PasswordHash: in.GetPasswordHash(),
+			})
+			if err != nil {
+				return nil, fmt.Errorf("fail verify username or password: %v", err)
+			}
+			if resp == nil {
+				return nil, fmt.Errorf("fail verify username or password")
+			}
+			meta.UserInfo = resp.Info
+		} else {
+			resp, err := grpc2.AuthLogin(ctx, &thirdlogingwpb.AuthLoginRequest{
+				Code:  in.GetAccount(),
+				AppID: in.GetAppID(),
+				Third: in.GetAccountType(),
+			})
+			if err != nil {
+				return nil, fmt.Errorf("fail auth login: %v", err)
+			}
+			if resp == nil {
+				return nil, fmt.Errorf("fail auth login")
+			}
+			meta.UserInfo = resp
 		}
 
 		// TODO: correct login type according to account match
-
-		meta.UserInfo = resp.Info
-		meta.UserID = uuid.MustParse(resp.Info.User.ID)
+		meta.UserID = uuid.MustParse(meta.UserInfo.User.ID)
 
 		token, err = createToken(meta)
 		if err != nil {
-			return nil, xerrors.Errorf("fail create token: %v", err)
+			return nil, fmt.Errorf("fail create token: %v", err)
 		}
 	}
 
 	err = createCache(ctx, meta)
 	if err != nil {
-		return nil, xerrors.Errorf("fail create cache: %v", err)
+		return nil, fmt.Errorf("fail create cache: %v", err)
 	}
 
 	err = loginhistorycrud.Create(ctx, &npool.LoginHistory{
@@ -113,7 +130,7 @@ func Login(ctx context.Context, in *npool.LoginRequest) (*npool.LoginResponse, e
 		UserAgent: meta.UserAgent,
 	})
 	if err != nil {
-		return nil, xerrors.Errorf("fail create login history: %v", err)
+		return nil, fmt.Errorf("fail create login history: %v", err)
 	}
 	// TODO: check login type of app
 
@@ -126,21 +143,21 @@ func Login(ctx context.Context, in *npool.LoginRequest) (*npool.LoginResponse, e
 func Logined(ctx context.Context, in *npool.LoginedRequest) (*npool.LoginedResponse, error) {
 	appID, err := uuid.Parse(in.GetAppID())
 	if err != nil {
-		return nil, xerrors.Errorf("invalid app id: %v", err)
+		return nil, fmt.Errorf("invalid app id: %v", err)
 	}
 
 	userID, err := uuid.Parse(in.GetUserID())
 	if err != nil {
-		return nil, xerrors.Errorf("invalid user id: %v", err)
+		return nil, fmt.Errorf("invalid user id: %v", err)
 	}
 
 	if in.GetToken() == "" {
-		return nil, xerrors.Errorf("invalid token")
+		return nil, fmt.Errorf("invalid token")
 	}
 
 	meta, err := queryByAppUser(ctx, appID, userID)
 	if err != nil {
-		return nil, xerrors.Errorf("fail query login cache by app user: %v", err)
+		return nil, fmt.Errorf("fail query login cache by app user: %v", err)
 	}
 	if meta == nil {
 		logger.Sugar().Warnf("user %v not in cache", in)
@@ -155,7 +172,7 @@ func Logined(ctx context.Context, in *npool.LoginedRequest) (*npool.LoginedRespo
 
 	err = createCache(ctx, meta)
 	if err != nil {
-		return nil, xerrors.Errorf("fail create cache: %v", err)
+		return nil, fmt.Errorf("fail create cache: %v", err)
 	}
 
 	return &npool.LoginedResponse{
@@ -166,23 +183,23 @@ func Logined(ctx context.Context, in *npool.LoginedRequest) (*npool.LoginedRespo
 func UpdateCache(ctx context.Context, in *npool.UpdateCacheRequest) (*npool.UpdateCacheResponse, error) {
 	appID, err := uuid.Parse(in.GetInfo().GetUser().GetAppID())
 	if err != nil {
-		return nil, xerrors.Errorf("invalid app id: %v", err)
+		return nil, fmt.Errorf("invalid app id: %v", err)
 	}
 
 	userID, err := uuid.Parse(in.GetInfo().GetUser().GetID())
 	if err != nil {
-		return nil, xerrors.Errorf("invalid user id: %v", err)
+		return nil, fmt.Errorf("invalid user id: %v", err)
 	}
 
 	meta, err := queryByAppUser(ctx, appID, userID)
 	if err != nil {
-		return nil, xerrors.Errorf("fail query login cache by app user: %v", err)
+		return nil, fmt.Errorf("fail query login cache by app user: %v", err)
 	}
 
 	meta.UserInfo = in.GetInfo()
 	err = createCache(ctx, meta)
 	if err != nil {
-		return nil, xerrors.Errorf("fail delete login cache: %v", err)
+		return nil, fmt.Errorf("fail delete login cache: %v", err)
 	}
 
 	return &npool.UpdateCacheResponse{
@@ -193,22 +210,22 @@ func UpdateCache(ctx context.Context, in *npool.UpdateCacheRequest) (*npool.Upda
 func Logout(ctx context.Context, in *npool.LogoutRequest) (*npool.LogoutResponse, error) {
 	appID, err := uuid.Parse(in.GetAppID())
 	if err != nil {
-		return nil, xerrors.Errorf("invalid app id: %v", err)
+		return nil, fmt.Errorf("invalid app id: %v", err)
 	}
 
 	userID, err := uuid.Parse(in.GetUserID())
 	if err != nil {
-		return nil, xerrors.Errorf("invalid user id: %v", err)
+		return nil, fmt.Errorf("invalid user id: %v", err)
 	}
 
 	meta, err := queryByAppUser(ctx, appID, userID)
 	if err != nil {
-		return nil, xerrors.Errorf("fail query login cache by app user: %v", err)
+		return nil, fmt.Errorf("fail query login cache by app user: %v", err)
 	}
 
 	err = deleteCache(ctx, meta)
 	if err != nil {
-		return nil, xerrors.Errorf("fail delete login cache: %v", err)
+		return nil, fmt.Errorf("fail delete login cache: %v", err)
 	}
 
 	return &npool.LogoutResponse{
