@@ -10,9 +10,6 @@ import (
 	grpc2 "github.com/NpoolPlatform/login-gateway/pkg/grpc"
 	appusermgrpb "github.com/NpoolPlatform/message/npool/appusermgr"
 	npool "github.com/NpoolPlatform/message/npool/logingateway"
-	thirdlogingwpb "github.com/NpoolPlatform/message/npool/third-login-gateway"
-	thirdloginauth "github.com/NpoolPlatform/third-login-gateway/pkg/auth"
-
 	thirdgwpb "github.com/NpoolPlatform/message/npool/thirdgateway"
 
 	"github.com/google/uuid"
@@ -80,35 +77,15 @@ func Login(ctx context.Context, in *npool.LoginRequest) (*npool.LoginResponse, e
 		meta.AppID = appID
 		meta.Account = in.GetAccount()
 		meta.AccountType = in.GetAccountType()
-		_, ok := thirdloginauth.ThirdMap[in.GetAccountType()]
+		verify, ok := VerifyMap[in.GetAccountType()]
 		if !ok {
-			resp, err := grpc2.VerifyAppUserByAppAccountPassword(ctx, &appusermgrpb.VerifyAppUserByAppAccountPasswordRequest{
-				AppID:        in.GetAppID(),
-				Account:      in.GetAccount(),
-				PasswordHash: in.GetPasswordHash(),
-			})
-			if err != nil {
-				return nil, fmt.Errorf("fail verify username or password: %v", err)
-			}
-			if resp == nil {
-				return nil, fmt.Errorf("fail verify username or password")
-			}
-			meta.UserInfo = resp.Info
-		} else {
-			resp, err := grpc2.AuthLogin(ctx, &thirdlogingwpb.AuthLoginRequest{
-				Code:  in.GetAccount(),
-				AppID: in.GetAppID(),
-				Third: in.GetAccountType(),
-			})
-			if err != nil {
-				return nil, fmt.Errorf("fail auth login: %v", err)
-			}
-			if resp == nil {
-				return nil, fmt.Errorf("fail auth login")
-			}
-			meta.UserInfo = resp
+			return nil, fmt.Errorf("login method does not exist")
 		}
-
+		resp, err := verify.Verify(ctx, in)
+		if err != nil {
+			return nil, err
+		}
+		meta.UserInfo = resp
 		// TODO: correct login type according to account match
 		meta.UserID = uuid.MustParse(meta.UserInfo.User.ID)
 

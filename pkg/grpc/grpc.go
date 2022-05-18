@@ -5,15 +5,12 @@ import (
 	"fmt"
 	"time"
 
-	grpc2 "github.com/NpoolPlatform/go-service-framework/pkg/grpc"
-
 	appusermgrconst "github.com/NpoolPlatform/appuser-manager/pkg/message/const" //nolint
+	grpc2 "github.com/NpoolPlatform/go-service-framework/pkg/grpc"
 	appusermgrpb "github.com/NpoolPlatform/message/npool/appusermgr"
-
+	thirdlogingwpb "github.com/NpoolPlatform/message/npool/third-login-gateway"
 	thirdgwpb "github.com/NpoolPlatform/message/npool/thirdgateway"
 	thirdgwconst "github.com/NpoolPlatform/third-gateway/pkg/message/const"
-
-	thirdlogingwpb "github.com/NpoolPlatform/message/npool/third-login-gateway"
 	thirdlogingwconst "github.com/NpoolPlatform/third-login-gateway/pkg/message/const"
 )
 
@@ -21,7 +18,7 @@ const (
 	grpcTimeout = 5 * time.Second
 )
 
-func VerifyAppUserByAppAccountPassword(ctx context.Context, in *appusermgrpb.VerifyAppUserByAppAccountPasswordRequest) (*appusermgrpb.VerifyAppUserByAppAccountPasswordResponse, error) {
+func VerifyAppUserByAppAccountPassword(ctx context.Context, in *appusermgrpb.VerifyAppUserByAppAccountPasswordRequest) (*appusermgrpb.AppUserInfo, error) {
 	conn, err := grpc2.GetGRPCConn(appusermgrconst.ServiceName, grpc2.GRPCTAG)
 	if err != nil {
 		return nil, fmt.Errorf("fail get app user manager connection: %v", err)
@@ -33,7 +30,11 @@ func VerifyAppUserByAppAccountPassword(ctx context.Context, in *appusermgrpb.Ver
 	ctx, cancel := context.WithTimeout(ctx, grpcTimeout)
 	defer cancel()
 
-	return cli.VerifyAppUserByAppAccountPassword(ctx, in)
+	resp, err := cli.VerifyAppUserByAppAccountPassword(ctx, in)
+	if err != nil {
+		return nil, fmt.Errorf("fail get goods: %v", err)
+	}
+	return resp.GetInfo(), nil
 }
 
 func GetAppInfo(ctx context.Context, in *appusermgrpb.GetAppInfoRequest) (*appusermgrpb.GetAppInfoResponse, error) {

@@ -26,7 +26,7 @@ require (
 replace google.golang.org/grpc => github.com/grpc/grpc-go v1.41.0
 
 replace (
-	github.com/NpoolPlatform/appuser-manager => github.com/NpoolPlatform/appuser-manager v0.0.0-20220517105319-7f7e419d9228
-	github.com/NpoolPlatform/message => github.com/NpoolPlatform/message v0.0.0-20220517103704-7a7ba36495a4
-	github.com/NpoolPlatform/third-login-gateway => github.com/NpoolPlatform/third-login-gateway v0.0.0-20220517110054-7bbe4b5fa7db
+	github.com/NpoolPlatform/appuser-manager => github.com/NpoolPlatform/appuser-manager v0.0.0-20220518102322-fda5c6f5c73c
+	github.com/NpoolPlatform/message => github.com/NpoolPlatform/message v0.0.0-20220518093034-9f64c6f0c028
+	github.com/NpoolPlatform/third-login-gateway => github.com/NpoolPlatform/third-login-gateway v0.0.0-20220518103408-fe9e0ed44901
 )
