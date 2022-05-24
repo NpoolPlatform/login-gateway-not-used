@@ -8,8 +8,8 @@ import (
 	appusermgrconst "github.com/NpoolPlatform/appuser-manager/pkg/message/const" //nolint
 	grpc2 "github.com/NpoolPlatform/go-service-framework/pkg/grpc"
 	appusermgrpb "github.com/NpoolPlatform/message/npool/appusermgr"
-	thirdlogingwpb "github.com/NpoolPlatform/message/npool/third-login-gateway"
 	thirdgwpb "github.com/NpoolPlatform/message/npool/thirdgateway"
+	thirdlogingwpb "github.com/NpoolPlatform/message/npool/thirdlogingateway"
 	thirdgwconst "github.com/NpoolPlatform/third-gateway/pkg/message/const"
 	thirdlogingwconst "github.com/NpoolPlatform/third-login-gateway/pkg/message/const"
 )
@@ -70,7 +70,7 @@ func VerifyGoogleRecaptchaV3(ctx context.Context, in *thirdgwpb.VerifyGoogleReca
 	return client.VerifyGoogleRecaptchaV3(ctx, in)
 }
 
-func AuthLogin(ctx context.Context, in *thirdlogingwpb.AuthLoginRequest) (*appusermgrpb.AppUserInfo, error) {
+func AuthLogin(ctx context.Context, in *thirdlogingwpb.LoginRequest) (*appusermgrpb.AppUserInfo, error) {
 	conn, err := grpc2.GetGRPCConn(thirdlogingwconst.ServiceName, grpc2.GRPCTAG)
 	if err != nil {
 		return nil, fmt.Errorf("fail get third login gateway connection: %v", err)
@@ -82,7 +82,7 @@ func AuthLogin(ctx context.Context, in *thirdlogingwpb.AuthLoginRequest) (*appus
 	ctx, cancel := context.WithTimeout(ctx, grpcTimeout)
 	defer cancel()
 
-	resp, err := cli.AuthLogin(ctx, in)
+	resp, err := cli.Login(ctx, in)
 	if err != nil {
 		return nil, fmt.Errorf("fail auth login: %v", err)
 	}

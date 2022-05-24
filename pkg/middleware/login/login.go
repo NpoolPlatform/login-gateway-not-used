@@ -11,7 +11,6 @@ import (
 	appusermgrpb "github.com/NpoolPlatform/message/npool/appusermgr"
 	npool "github.com/NpoolPlatform/message/npool/logingateway"
 	thirdgwpb "github.com/NpoolPlatform/message/npool/thirdgateway"
-
 	"github.com/google/uuid"
 )
 

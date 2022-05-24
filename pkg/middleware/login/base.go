@@ -8,7 +8,7 @@ import (
 	grpc2 "github.com/NpoolPlatform/login-gateway/pkg/grpc"
 	appusermgrpb "github.com/NpoolPlatform/message/npool/appusermgr"
 	npool "github.com/NpoolPlatform/message/npool/logingateway"
-	thirdlogingwpb "github.com/NpoolPlatform/message/npool/third-login-gateway"
+	thirdlogingwpb "github.com/NpoolPlatform/message/npool/thirdlogingateway"
 )
 
 var VerifyMap = make(map[string]VerifyMethod)
@@ -27,7 +27,7 @@ type VerifyMethod interface {
 type ThirdAuthVerify struct{}
 
 func (ThirdAuthVerify) Verify(ctx context.Context, in *npool.LoginRequest) (*appusermgrpb.AppUserInfo, error) {
-	resp, err := grpc2.AuthLogin(ctx, &thirdlogingwpb.AuthLoginRequest{
+	resp, err := grpc2.AuthLogin(ctx, &thirdlogingwpb.LoginRequest{
 		Code:  in.GetAccount(),
 		AppID: in.GetAppID(),
 		Third: in.GetAccountType(),

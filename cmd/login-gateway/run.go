@@ -6,7 +6,6 @@ import (
 	"github.com/NpoolPlatform/login-gateway/api"
 	db "github.com/NpoolPlatform/login-gateway/pkg/db"
 	msgcli "github.com/NpoolPlatform/login-gateway/pkg/message/client"
-	msglistener "github.com/NpoolPlatform/login-gateway/pkg/message/listener"
 	msg "github.com/NpoolPlatform/login-gateway/pkg/message/message"
 	msgsrv "github.com/NpoolPlatform/login-gateway/pkg/message/server"
 
@@ -43,8 +42,6 @@ var runCmd = &cli.Command{
 		if err := msgcli.Init(); err != nil {
 			return err
 		}
-
-		go msglistener.Listen()
 		go msgSender()
 
 		return grpc2.RunGRPCGateWay(rpcGatewayRegister)
