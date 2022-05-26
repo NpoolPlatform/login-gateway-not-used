@@ -2,6 +2,7 @@ package loginhistory
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	db "github.com/NpoolPlatform/login-gateway/pkg/db"
@@ -9,8 +10,6 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/logingateway"
 
 	"github.com/google/uuid"
-
-	"golang.org/x/xerrors"
 )
 
 const (
@@ -23,17 +22,17 @@ func Create(ctx context.Context, in *npool.LoginHistory) error {
 
 	cli, err := db.Client()
 	if err != nil {
-		return xerrors.Errorf("fail get db client: %v", err)
+		return fmt.Errorf("fail get db client: %v", err)
 	}
 
 	appID, err := uuid.Parse(in.GetAppID())
 	if err != nil {
-		return xerrors.Errorf("invalid app id: %v", err)
+		return fmt.Errorf("invalid app id: %v", err)
 	}
 
 	userID, err := uuid.Parse(in.GetUserID())
 	if err != nil {
-		return xerrors.Errorf("invalid user id: %v", err)
+		return fmt.Errorf("invalid user id: %v", err)
 	}
 
 	_, err = cli.
@@ -46,7 +45,7 @@ func Create(ctx context.Context, in *npool.LoginHistory) error {
 		SetLocation(in.GetLocation()).
 		Save(ctx)
 	if err != nil {
-		return xerrors.Errorf("fail create login history: %v", err)
+		return fmt.Errorf("fail create login history: %v", err)
 	}
 
 	return nil
@@ -58,12 +57,12 @@ func Update(ctx context.Context, in *npool.LoginHistory) error {
 
 	cli, err := db.Client()
 	if err != nil {
-		return xerrors.Errorf("fail get db client: %v", err)
+		return fmt.Errorf("fail get db client: %v", err)
 	}
 
 	id, err := uuid.Parse(in.GetID())
 	if err != nil {
-		return xerrors.Errorf("invalid id: %v", err)
+		return fmt.Errorf("invalid id: %v", err)
 	}
 
 	_, err = cli.
@@ -72,7 +71,7 @@ func Update(ctx context.Context, in *npool.LoginHistory) error {
 		SetLocation(in.GetLocation()).
 		Save(ctx)
 	if err != nil {
-		return xerrors.Errorf("fail update clogin history: %v", err)
+		return fmt.Errorf("fail update clogin history: %v", err)
 	}
 
 	return nil
@@ -84,17 +83,17 @@ func GetByAppUser(ctx context.Context, in *npool.GetLoginHistoriesRequest) (*npo
 
 	cli, err := db.Client()
 	if err != nil {
-		return nil, xerrors.Errorf("fail get db client: %v", err)
+		return nil, fmt.Errorf("fail get db client: %v", err)
 	}
 
 	appID, err := uuid.Parse(in.GetAppID())
 	if err != nil {
-		return nil, xerrors.Errorf("invalid app id: %v", err)
+		return nil, fmt.Errorf("invalid app id: %v", err)
 	}
 
 	userID, err := uuid.Parse(in.GetUserID())
 	if err != nil {
-		return nil, xerrors.Errorf("invalid user id: %v", err)
+		return nil, fmt.Errorf("invalid user id: %v", err)
 	}
 
 	infos, err := cli.
@@ -108,7 +107,7 @@ func GetByAppUser(ctx context.Context, in *npool.GetLoginHistoriesRequest) (*npo
 		).
 		All(ctx)
 	if err != nil {
-		return nil, xerrors.Errorf("fail query login history: %v", err)
+		return nil, fmt.Errorf("fail query login history: %v", err)
 	}
 
 	histories := []*npool.LoginHistory{}

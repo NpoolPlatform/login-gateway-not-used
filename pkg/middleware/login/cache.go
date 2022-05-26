@@ -10,8 +10,6 @@ import (
 
 	"github.com/go-redis/redis/v8"
 	"github.com/google/uuid"
-
-	"golang.org/x/xerrors"
 )
 
 const (
@@ -43,7 +41,7 @@ type valAppUser struct {
 func createCache(ctx context.Context, meta *Metadata) error {
 	cli, err := redis2.GetClient()
 	if err != nil {
-		return xerrors.Errorf("fail get redis client: %v", err)
+		return fmt.Errorf("fail get redis client: %v", err)
 	}
 
 	ctx, cancel := context.WithTimeout(ctx, redisTimeout)
@@ -51,12 +49,12 @@ func createCache(ctx context.Context, meta *Metadata) error {
 
 	body, err := json.Marshal(meta)
 	if err != nil {
-		return xerrors.Errorf("fail marshal login account meta: %v", err)
+		return fmt.Errorf("fail marshal login account meta: %v", err)
 	}
 
 	err = cli.Set(ctx, metaToAccountKey(meta), body, loginExpiration).Err()
 	if err != nil {
-		return xerrors.Errorf("fail create login account cache: %v", err)
+		return fmt.Errorf("fail create login account cache: %v", err)
 	}
 
 	body, err = json.Marshal(&valAppUser{
@@ -64,12 +62,12 @@ func createCache(ctx context.Context, meta *Metadata) error {
 		AccountType: meta.AccountType,
 	})
 	if err != nil {
-		return xerrors.Errorf("fail marshal login user meta: %v", err)
+		return fmt.Errorf("fail marshal login user meta: %v", err)
 	}
 
 	err = cli.Set(ctx, metaToUserKey(meta), body, loginExpiration).Err()
 	if err != nil {
-		return xerrors.Errorf("fail create login user cache: %v", err)
+		return fmt.Errorf("fail create login user cache: %v", err)
 	}
 
 	return nil
@@ -78,7 +76,7 @@ func createCache(ctx context.Context, meta *Metadata) error {
 func queryByAppAccount(ctx context.Context, appID uuid.UUID, account, loginType string) (*Metadata, error) {
 	cli, err := redis2.GetClient()
 	if err != nil {
-		return nil, xerrors.Errorf("fail get redis client: %v", err)
+		return nil, fmt.Errorf("fail get redis client: %v", err)
 	}
 
 	ctx, cancel := context.WithTimeout(ctx, redisTimeout)
@@ -88,13 +86,13 @@ func queryByAppAccount(ctx context.Context, appID uuid.UUID, account, loginType 
 	if err == redis.Nil {
 		return nil, nil
 	} else if err != nil {
-		return nil, xerrors.Errorf("fail get app account: %v", err)
+		return nil, fmt.Errorf("fail get app account: %v", err)
 	}
 
 	meta := Metadata{}
 	err = json.Unmarshal([]byte(val), &meta)
 	if err != nil {
-		return nil, xerrors.Errorf("fail unmarshal val: %v", err)
+		return nil, fmt.Errorf("fail unmarshal val: %v", err)
 	}
 
 	return &meta, nil
@@ -103,7 +101,7 @@ func queryByAppAccount(ctx context.Context, appID uuid.UUID, account, loginType 
 func queryByAppUser(ctx context.Context, appID, userID uuid.UUID) (*Metadata, error) {
 	cli, err := redis2.GetClient()
 	if err != nil {
-		return nil, xerrors.Errorf("fail get redis client: %v", err)
+		return nil, fmt.Errorf("fail get redis client: %v", err)
 	}
 
 	ctx, cancel := context.WithTimeout(ctx, redisTimeout)
@@ -113,26 +111,26 @@ func queryByAppUser(ctx context.Context, appID, userID uuid.UUID) (*Metadata, er
 	if err == redis.Nil {
 		return nil, nil
 	} else if err != nil {
-		return nil, xerrors.Errorf("fail get app user: %v", err)
+		return nil, fmt.Errorf("fail get app user: %v", err)
 	}
 
 	appUser := valAppUser{}
 	err = json.Unmarshal([]byte(val), &appUser)
 	if err != nil {
-		return nil, xerrors.Errorf("fail unmarshal val: %v", err)
+		return nil, fmt.Errorf("fail unmarshal val: %v", err)
 	}
 
 	val, err = cli.Get(ctx, appAccountKey(appID, appUser.Account, appUser.AccountType)).Result()
 	if err == redis.Nil {
 		return nil, nil
 	} else if err != nil {
-		return nil, xerrors.Errorf("fail get app user: %v", err)
+		return nil, fmt.Errorf("fail get app user: %v", err)
 	}
 
 	meta := Metadata{}
 	err = json.Unmarshal([]byte(val), &meta)
 	if err != nil {
-		return nil, xerrors.Errorf("fail unmarshal val: %v", err)
+		return nil, fmt.Errorf("fail unmarshal val: %v", err)
 	}
 
 	return &meta, nil
@@ -141,7 +139,7 @@ func queryByAppUser(ctx context.Context, appID, userID uuid.UUID) (*Metadata, er
 func deleteCache(ctx context.Context, meta *Metadata) error {
 	cli, err := redis2.GetClient()
 	if err != nil {
-		return xerrors.Errorf("fail get redis client: %v", err)
+		return fmt.Errorf("fail get redis client: %v", err)
 	}
 
 	ctx, cancel := context.WithTimeout(ctx, redisTimeout)
@@ -149,12 +147,12 @@ func deleteCache(ctx context.Context, meta *Metadata) error {
 
 	err = cli.Del(ctx, metaToUserKey(meta)).Err()
 	if err != nil {
-		return xerrors.Errorf("fail delete login user cache")
+		return fmt.Errorf("fail delete login user cache")
 	}
 
 	err = cli.Del(ctx, metaToAccountKey(meta)).Err()
 	if err != nil {
-		return xerrors.Errorf("fail delete login account cache")
+		return fmt.Errorf("fail delete login account cache")
 	}
 
 	return nil
