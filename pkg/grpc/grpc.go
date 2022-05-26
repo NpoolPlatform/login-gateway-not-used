@@ -89,3 +89,23 @@ func AuthLogin(ctx context.Context, in *thirdlogingwpb.LoginRequest) (*appusermg
 
 	return resp.Info, nil
 }
+
+func GetThirdPartyOnly(ctx context.Context, in *thirdlogingwpb.GetThirdPartyOnlyRequest) (*thirdlogingwpb.ThirdParty, error) {
+	conn, err := grpc2.GetGRPCConn(thirdlogingwconst.ServiceName, grpc2.GRPCTAG)
+	if err != nil {
+		return nil, fmt.Errorf("fail get third login gateway connection: %v", err)
+	}
+	defer conn.Close()
+
+	cli := thirdlogingwpb.NewThirdLoginGatewayClient(conn)
+
+	ctx, cancel := context.WithTimeout(ctx, grpcTimeout)
+	defer cancel()
+
+	resp, err := cli.GetThirdPartyOnly(ctx, in)
+	if err != nil {
+		return nil, fmt.Errorf("fail auth login: %v", err)
+	}
+
+	return resp.Info, nil
+}

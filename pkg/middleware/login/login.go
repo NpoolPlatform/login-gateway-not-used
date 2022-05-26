@@ -6,12 +6,16 @@ import (
 
 	appusermgrconst "github.com/NpoolPlatform/appuser-manager/pkg/const"
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
+	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	loginhistorycrud "github.com/NpoolPlatform/login-gateway/pkg/crud/loginhistory"
 	grpc2 "github.com/NpoolPlatform/login-gateway/pkg/grpc"
 	appusermgrpb "github.com/NpoolPlatform/message/npool/appusermgr"
 	npool "github.com/NpoolPlatform/message/npool/logingateway"
 	thirdgwpb "github.com/NpoolPlatform/message/npool/thirdgateway"
+	thirdlogingwrpb "github.com/NpoolPlatform/message/npool/thirdlogingateway"
+	thirdlogingwrconst "github.com/NpoolPlatform/third-login-gateway/pkg/const"
 	"github.com/google/uuid"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 func Login(ctx context.Context, in *npool.LoginRequest) (*npool.LoginResponse, error) { //nolint
@@ -76,15 +80,45 @@ func Login(ctx context.Context, in *npool.LoginRequest) (*npool.LoginResponse, e
 		meta.AppID = appID
 		meta.Account = in.GetAccount()
 		meta.AccountType = in.GetAccountType()
-		verify, ok := VerifyMap[in.GetAccountType()]
-		if !ok {
-			return nil, fmt.Errorf("login method does not exist")
+		if in.GetAccountType() == appusermgrconst.SignupByEmail || in.GetAccountType() == appusermgrconst.SignupByMobile {
+			resp, err := grpc2.VerifyAppUserByAppAccountPassword(ctx, &appusermgrpb.VerifyAppUserByAppAccountPasswordRequest{
+				AppID:        in.GetAppID(),
+				Account:      in.GetAccount(),
+				PasswordHash: in.GetPasswordHash(),
+			})
+			if err != nil {
+				return nil, fmt.Errorf("fail verify username or password: %v", err)
+			}
+			if resp == nil {
+				return nil, fmt.Errorf("fail verify username or password")
+			}
+			meta.UserInfo = resp
+		} else {
+			conds := cruder.NewFilterConds()
+			conds.WithCond(thirdlogingwrconst.ThirdPartyFieldBrandName, cruder.EQ, structpb.NewStringValue(in.GetAccountType()))
+			resp, err := grpc2.GetThirdPartyOnly(ctx, &thirdlogingwrpb.GetThirdPartyOnlyRequest{
+				Conds: conds,
+			})
+			if err != nil {
+				return nil, err
+			}
+			if resp == nil {
+				return nil, fmt.Errorf("unknown login mode")
+			}
+			userInfo, err := grpc2.AuthLogin(ctx, &thirdlogingwrpb.LoginRequest{
+				Code:         in.GetAccount(),
+				AppID:        in.GetAppID(),
+				ThirdPartyID: resp.GetID(),
+			})
+			if err != nil {
+				return nil, fmt.Errorf("fail auth login: %v", err)
+			}
+			if userInfo == nil {
+				return nil, fmt.Errorf("fail auth login")
+			}
+			meta.UserInfo = userInfo
 		}
-		resp, err := verify.Verify(ctx, in)
-		if err != nil {
-			return nil, err
-		}
-		meta.UserInfo = resp
+
 		// TODO: correct login type according to account match
 		meta.UserID = uuid.MustParse(meta.UserInfo.User.ID)
 
