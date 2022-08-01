@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	appusermgrpb "github.com/NpoolPlatform/message/npool/appusermgr"
+	appusermgrpb "github.com/NpoolPlatform/message/npool/appuser/mgr/v1"
 	"github.com/dgrijalva/jwt-go"
 	"google.golang.org/grpc/metadata"
 
